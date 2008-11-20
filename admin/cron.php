@@ -34,6 +34,13 @@
     require_once($CFG->libdir.'/adminlib.php');
     require_once($CFG->libdir.'/gradelib.php');
 
+/// Skip cron if another instance is running
+    $lock_handler = fopen($CFG->dataroot . '/cron.lock', 'w');
+    if (!flock($lock_handler, LOCK_EX | LOCK_NB)) {
+        mtrace("Cron already running!");
+        die;
+    }
+
 /// Extra debugging (set in config.php)
     if (!empty($CFG->showcronsql)) {
         $db->debug = true;
