@@ -48,6 +48,7 @@ $string['KH'] = 'Cambodia';
 $string['CM'] = 'Cameroon';
 $string['CA'] = 'Canada';
 $string['CV'] = 'Cape Verde';
+$string['CT'] = 'Catalonia';
 $string['KY'] = 'Cayman Islands';
 $string['CF'] = 'Central African Republic';
 $string['TD'] = 'Chad';
