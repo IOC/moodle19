@@ -154,10 +154,8 @@ class user_editadvanced_form extends moodleform {
         }
 
         if (!$user or $user->email !== stripslashes($usernew->email)) {
-            if (!validate_email(stripslashes($usernew->email))) {
+            if (!empty($usernew->email) and !validate_email(stripslashes($usernew->email))) {
                 $err['email'] = get_string('invalidemail');
-            } else if (record_exists('user', 'email', $usernew->email, 'mnethostid', $CFG->mnet_localhost_id)) {
-                $err['email'] = get_string('emailexists');
             }
         }
 
