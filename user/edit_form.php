@@ -117,10 +117,8 @@ class user_edit_form extends moodleform {
         // validate email
         if (!isset($usernew->email)) {
             // mail not confirmed yet
-        } else if (!validate_email(stripslashes($usernew->email))) {
+        } else if (!empty($usernew->email) and !validate_email(stripslashes($usernew->email))) {
             $errors['email'] = get_string('invalidemail');
-        } else if ((stripslashes($usernew->email) !== $user->email) and record_exists('user', 'email', $usernew->email, 'mnethostid', $CFG->mnet_localhost_id)) {
-            $errors['email'] = get_string('emailexists');
         }
 
         if (isset($usernew->email) and stripslashes($usernew->email) === $user->email and over_bounce_threshold($user)) {
