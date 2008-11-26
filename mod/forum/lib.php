@@ -50,6 +50,11 @@ function forum_add_instance($forum) {
         $forum->assesstimefinish = 0;
     }
 
+    $context = get_context_instance(CONTEXT_COURSE, $forum->course);
+    if (!has_capability('moodle/legacy:admin', $context)) {
+        $forum->forcesubscribe = FORUM_DISALLOWSUBSCRIBE;
+    }
+
     if (!$forum->id = insert_record('forum', $forum)) {
         return false;
     }
@@ -110,6 +115,11 @@ function forum_update_instance($forum) {
     if (empty($forum->ratingtime) or empty($forum->assessed)) {
         $forum->assesstimestart  = 0;
         $forum->assesstimefinish = 0;
+    }
+
+    $context = get_context_instance(CONTEXT_COURSE, $forum->course);
+    if (!has_capability('moodle/legacy:admin', $context)) {
+        unset($forum->forcesubscribe);
     }
 
     $oldforum = get_record('forum', 'id', $forum->id);
@@ -2632,18 +2642,18 @@ function forum_get_course_forum($courseid, $type) {
         case "news":
             $forum->name  = addslashes(get_string("namenews", "forum"));
             $forum->intro = addslashes(get_string("intronews", "forum"));
-            $forum->forcesubscribe = FORUM_FORCESUBSCRIBE;
+            $forum->forcesubscribe = FORUM_DISALLOWSUBSCRIBE;
             $forum->assessed = 0;
             if ($courseid == SITEID) {
                 $forum->name  = get_string("sitenews");
-                $forum->forcesubscribe = 0;
+                $forum->forcesubscribe = FORUM_DISALLOWSUBSCRIBE;
             }
             break;
         case "social":
             $forum->name  = addslashes(get_string("namesocial", "forum"));
             $forum->intro = addslashes(get_string("introsocial", "forum"));
             $forum->assessed = 0;
-            $forum->forcesubscribe = 0;
+            $forum->forcesubscribe = FORUM_DISALLOWSUBSCRIBE;
             break;
         default:
             notify("That forum type doesn't exist!");
