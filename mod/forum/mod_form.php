@@ -38,6 +38,7 @@ class mod_forum_mod_form extends moodleform_mod {
         $options[FORUM_INITIALSUBSCRIBE] = get_string('yesinitially', 'forum');
         $options[FORUM_DISALLOWSUBSCRIBE] = get_string('disallowsubscribe','forum');
         $mform->addElement('select', 'forcesubscribe', get_string('forcesubscribeq', 'forum'), $options);
+        $mform->setDefault('forcesubscribe', FORUM_DISALLOWSUBSCRIBE);
         $mform->setHelpButton('forcesubscribe', array('subscription2', get_string('forcesubscribeq', 'forum'), 'forum'));
 
         $options = array();
@@ -142,6 +143,11 @@ class mod_forum_mod_form extends moodleform_mod {
 //-------------------------------------------------------------------------------
 // buttons
         $this->add_action_buttons();
+
+        $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+        if (!has_capability('moodle/legacy:admin', $context)) {
+            $mform->freeze(array('forcesubscribe'));
+        }
 
     }
 
