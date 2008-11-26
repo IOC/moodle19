@@ -3350,6 +3350,21 @@ function update_course($data) {
         unset($data->restrictmodules);
     }
 
+    $context = get_context_instance(CONTEXT_COURSE, $data->id);
+    if (!has_capability('moodle/legacy:admin', $context)) {
+        unset($data->fullname);
+        unset($data->shortname);
+        unset($data->idnumber);
+        unset($data->enrol);
+        unset($data->defaultrole);
+        unset($data->enrollable);
+        unset($data->enrolstartdate);
+        unset($data->enrolenddate);
+        unset($data->expirynotify);
+        unset($data->expirythreshold);
+        unset($data->notifystudents);
+    }
+
     $movecat = false;
     $oldcourse = get_record('course', 'id', $data->id); // should not fail, already tested above
     if (!has_capability('moodle/course:create', get_context_instance(CONTEXT_COURSECAT, $oldcourse->category))
