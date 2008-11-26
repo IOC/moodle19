@@ -434,6 +434,17 @@ class course_edit_form extends moodleform {
         $mform->setType('student', PARAM_RAW);
         $mform->addElement('hidden', 'students', get_string('defaultcoursestudents'));
         $mform->setType('students', PARAM_RAW);
+
+        if (!empty($course)) {
+            $context = get_context_instance(CONTEXT_COURSE, $course->id);
+            if (!has_capability('moodle/legacy:admin', $context)) {
+                $mform->freeze(array('fullname', 'shortname', 'idnumber', 'enrol',
+                                     'defaultrole', 'enrollable', 'enrolperiod',
+                                     'enrolstartdategrp', 'enroldateendgrp',
+                                     'expirynotify', 'expirythreshold',
+                                     'notifystudents'));
+            }
+        }
     }
 
     function definition_after_data() {
