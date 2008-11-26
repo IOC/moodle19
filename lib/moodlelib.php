@@ -2337,7 +2337,7 @@ function update_user_login_times() {
  * @return bool
  */
 function user_not_fully_set_up($user) {
-    return ($user->username != 'guest' and (empty($user->firstname) or empty($user->lastname) or empty($user->email) or over_bounce_threshold($user)));
+    return ($user->username != 'guest' and (empty($user->firstname) or empty($user->lastname) or over_bounce_threshold($user)));
 }
 
 function over_bounce_threshold($user) {
@@ -4212,6 +4212,10 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml='', $a
 
     if (empty($user) || empty($user->email)) {
         return false;
+    }
+
+    if (empty($user->email)) {
+        return true;
     }
 
     if (!empty($user->deleted)) {
