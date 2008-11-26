@@ -97,6 +97,11 @@ class data_field_number extends data_field_base {
         }
     }
 
+    function display_add_field($recordid=0){
+        $str = parent::display_add_field($recordid);
+        return str_replace('300px;', '100px', $str);
+    }
+
 }
 
 ?>
