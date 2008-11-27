@@ -3010,6 +3010,8 @@ function assignment_print_overview($courses, &$htmlarray) {
                                       WHERE userid = {$USER->id} AND
                                       assignment IN (".implode(',', $assignmentids).")");
 
+    $student_groups = array();
+
     foreach ($assignments as $assignment) {
         $str = '<div class="assignment overview"><div class="name">'.$strassignment. ': '.
                '<a '.($assignment->visible ? '':' class="dimmed"').
@@ -3031,17 +3033,47 @@ function assignment_print_overview($courses, &$htmlarray) {
             } else {
                 $gradebookroles = '';
             }
+            if (!isset($student_groups[$assignment->course])) {
+                $student_groups[$assignment->course] = array();
+                $sql = "SELECT gm.id, gm.userid, g.id AS groupid"
+                    . " FROM {$CFG->prefix}groups g"
+                    . " JOIN {$CFG->prefix}groups_members gm ON g.id = gm.groupid"
+                    . " WHERE g.courseid = {$assignment->course}";
+                if ($groups_members = get_records_sql($sql)) {
+                    foreach ($groups_members as $member) {
+                        $student_groups[$assignment->course][$member->userid][] = $member->groupid;
+                    }
+                }
+            }
+            $group_submissions = array();
             $students = get_users_by_capability($context, 'mod/assignment:submit', 'u.id', '', '', '', 0, '', false);
             if ($students) {
                 foreach($students as $student){
                     if(isset($unmarkedsubmissions[$assignment->id][$student->id])){
                         $submissions++;
+                        if (isset($student_groups[$assignment->course][$student->id])) {
+                            foreach ($student_groups[$assignment->course][$student->id] as $groupid) {
+                                if (!isset($group_submissions[$groupid])) {
+                                    $group_submissions[$groupid] = 0;
+                                }
+                                $group_submissions[$groupid]++;
+                            }
+                        }
                     }
                 }
             }
 
             if ($submissions) {
                 $str .= get_string('submissionsnotgraded', 'assignment', $submissions);
+            }
+
+            if ($group_submissions) {
+                $str_groups = array();
+                foreach ($group_submissions as $id => $count) {
+                    $name = groups_get_group_name($id);
+                    $str_groups[] = $name . ': '. $count;
+                }
+                $str .= ' (' . implode(' / ', $str_groups) . ')';
             }
         } else {
             if(isset($mysubmissions[$assignment->id])){
