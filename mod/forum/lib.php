@@ -1096,9 +1096,7 @@ function forum_print_overview($courses,&$htmlarray) {
     $sql .= ") AND l.module = 'forum' AND action = 'add post' "
         ." AND userid != ".$USER->id." GROUP BY cmid,l.course,instance";
 
-    if (!$new = get_records_sql($sql)) {
-        $new = array(); // avoid warnings
-    }
+    $new = array();
 
     // also get all forum tracking stuff ONCE.
     $trackingforums = array();
@@ -1152,9 +1150,8 @@ function forum_print_overview($courses,&$htmlarray) {
             $str .= '<div class="overview forum"><div class="name">'.$strforum.': <a title="'.$strforum.'" href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$forum->id.'">'.
                 $forum->name.'</a></div>';
             $str .= '<div class="info">';
-            $str .= $count.' '.$strnumpostssince;
             if (!empty($showunread)) {
-                $str .= '<br />'.$thisunread .' '.$strnumunread;
+                $str .= $thisunread .' '.$strnumunread;
             }
             $str .= '</div></div>';
         }
