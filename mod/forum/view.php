@@ -240,6 +240,7 @@
             if (!empty($forum->intro)) {
                 $options = new stdclass;
                 $options->para = false;
+                $options->noclean = true;
                 print_box(format_text($forum->intro, FORMAT_MOODLE, $options), 'generalbox', 'intro');
             }
             echo '<p class="mdl-align">';
@@ -268,6 +269,7 @@
             if (!empty($forum->intro)) {
                 $options = new stdclass;
                 $options->para = false;
+                $options->noclean = true;
                 print_box(format_text($forum->intro, FORMAT_MOODLE, $options), 'generalbox', 'intro');
             }
             echo '<br />';
