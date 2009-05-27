@@ -48,6 +48,9 @@ function display() {
 
     if ($resource->reference) {
         $relativepath = "{$course->id}/{$resource->reference}";
+        if (preg_match('/^__materials__\/(.*)$/', $resource->reference, &$match)) {
+            $relativepath = 'materials/' . $match[1];
+        }
     } else {
         $relativepath = "{$course->id}";
     }
@@ -138,7 +141,12 @@ function display() {
         } else {
             echo '<tr class="file">';
             echo '<td class="name">';
-            link_to_popup_window($relativeurl, "resourcedirectory{$resource->id}", "<img src=\"$CFG->pixpath/f/$icon\" class=\"icon\" alt=\"$strfile\" />&nbsp;$file", 450, 600, '');
+            if (preg_match('/^materials\/(.*)$/', $relativepath, &$match)) {
+                $url = $CFG->local_materials_url . '/' . $match[1] . '/' . $file;
+                echo "<a href=\"$url\" title=\"$file\"><img src=\"$CFG->pixpath/f/$icon\" class=\"icon\" alt=\"$strfile\" />&nbsp;$file</a>";
+            } else {
+                link_to_popup_window($relativeurl, "resourcedirectory{$resource->id}", "<img src=\"$CFG->pixpath/f/$icon\" class=\"icon\" alt=\"$strfile\" />&nbsp;$file", 450, 600, '');
+            }
         }
         echo '</td>';
         echo '<td>&nbsp;</td>';
@@ -176,13 +184,26 @@ function setup($form) {
 }
 
 function setup_elements(&$mform) {
-    global $CFG;
+    global $CFG, $COURSE;
 
     $rawdirs = get_directory_list($CFG->dataroot.'/'.$this->course->id, array($CFG->moddata, 'backupdata'), true, true, false);
     $dirs = array();
     $dirs[0]=get_string('maindirectory', 'resource');
     foreach ($rawdirs as $rawdir) {
         $dirs[$rawdir] = $rawdir;
+    }
+
+    if ($records = get_records('local_materials', 'course', $COURSE->id, 'path')) {
+        foreach ($records as $record) {
+            $path = trim($record->path, '/');
+            $reference = "__materials__/$path";
+            $dirs[$reference] = "Materials: $path";
+            $rawdirs = get_directory_list("{$CFG->dataroot}/materials/$path",
+                                          '', true, true, false);
+            foreach ($rawdirs as $rawdir) {
+                $dirs["$reference/$rawdir"] = "Materials: $path/$rawdir";
+            }
+        }
     }
 
     $mform->addElement('select', 'reference', get_string('resourcetypedirectory', 'resource'), $dirs);
