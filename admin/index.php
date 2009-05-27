@@ -651,6 +651,29 @@
         print_box(get_string('cfgwwwrootwarning', 'admin'), 'generalbox adminwarning');
     }
 
+    /// Materials
+    $materials_not_a_link = (file_exists("{$CFG->dataroot}/materials") and
+                             !is_link("{$CFG->dataroot}/materials"));
+    $materials_current_dir = (is_link("{$CFG->dataroot}/materials") ?
+                              readlink("{$CFG->dataroot}/materials") : false);
+    $materials_config_dir = (!empty($CFG->local_materials_dir) ?
+                             $CFG->local_materials_dir : false);
+    if ($materials_not_a_link) {
+        print_box("Materials: <em>{$CFG->dataroot}/materials</em> no és un enllaç simbòlic.",
+                  'generalbox adminwarning');
+    } elseif ($materials_current_dir and !$materials_config_dir) {
+        unlink("{$CFG->dataroot}/materials");
+        print_box("Materials: s'ha eliminat l'enllaç.",
+                  'generalbox adminwarning');
+    } elseif ($materials_config_dir and $materials_current_dir != $materials_config_dir) {
+        if ($materials_current_dir) {
+            unlink("{$CFG->dataroot}/materials");
+        }
+        symlink($materials_config_dir, "{$CFG->dataroot}/materials");
+        print_box("Materials: s'ha enllaçat a <em>$materials_config_dir</em>.",
+                  'generalbox adminwarning');
+    }
+
 /// If no recently cron run
     $lastcron = get_field_sql('SELECT max(lastcron) FROM ' . $CFG->prefix . 'modules');
     if (time() - $lastcron > 3600 * 24) {
