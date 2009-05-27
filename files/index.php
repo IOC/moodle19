@@ -22,6 +22,8 @@
     $save    = optional_param('save', 0, PARAM_BOOL);
     $text    = optional_param('text', '', PARAM_RAW);
     $confirm = optional_param('confirm', 0, PARAM_BOOL);
+    $materials = optional_param('materials', '', PARAM_PATH);
+    $materialscourse = optional_param('materialscourse', 0, PARAM_INT);
 
     if ($choose) {
         if (count(explode('.', $choose)) > 2) {
@@ -49,6 +51,7 @@
     function html_header($course, $wdir, $formfield=""){
         global $CFG, $ME, $choose;
         global $url;
+        global $materials;
 
         $navlinks = array();
         // $navlinks[] = array('name' => $course->shortname, 'link' => "../course/view.php?id=$course->id", 'type' => 'misc');
@@ -60,14 +63,24 @@
         }
 
         if ($wdir == "/") {
-            $navlinks[] = array('name' => $strfiles, 'link' => null, 'type' => 'misc');
+            if ($materials) {
+                $navlinks[] = array('name' => 'Materials: '.$materials, 'link' => null, 'type' => 'misc');
+            } else {
+                $navlinks[] = array('name' => $strfiles, 'link' => null, 'type' => 'misc');
+            }
         } else {
             $dirs = explode("/", $wdir);
             $numdirs = count($dirs);
             $link = "";
-            $navlinks[] = array('name' => $strfiles,
-                                'link' => $url->out(false, array('wdir'=> '/')),
-                                'type' => 'misc');
+            if ($materials) {
+                $navlinks[] = array('name' => 'Materials: ' . $materials,
+                                    'link' => $url->out(false, array('wdir' => '/')),
+                                    'type' => 'misc');
+            } else {
+                $navlinks[] = array('name' => $strfiles,
+                                    'link' => $url->out(false, array('wdir'=> '/')),
+                                    'type' => 'misc');
+            }
 
             for ($i=1; $i<$numdirs-1; $i++) {
                 $link .= "/".$dirs[$i];
@@ -126,27 +139,32 @@
             $fullnav = str_replace('->', '&raquo;', format_string($course->shortname) . " -> " . $fullnav);
             echo '<div id="nav-bar">'.$fullnav.'</div>';
 
-            if ($course->id == SITEID and $wdir != "/backupdata") {
-                print_heading(get_string("publicsitefileswarning3"), "center", 2);
+            if (!$materials and $course->id == SITEID and $wdir != "/backupdata" or materials_public()) {
+                print_heading(get_string("publicsitefileswarning"), "center", 2);
             }
 
         } else {
 
             if ($course->id == SITEID) {
 
-                if ($wdir == "/backupdata") {
+                if (!$materials and $wdir == "/backupdata") {
                     admin_externalpage_setup('frontpagerestore');
                     admin_externalpage_print_header();
                 } else {
                     admin_externalpage_setup('sitefiles');
                     admin_externalpage_print_header();
 
-                    print_heading(get_string("publicsitefileswarning3"), "center", 2);
+                    if (!$materials or materials_public()) {
+                        print_heading(get_string("publicsitefileswarning"), "center", 2);
+                    }
 
                 }
 
             } else {
                 print_header("$course->shortname: $strfiles", $course->fullname, $navigation,  $formfield);
+                if (materials_public()) {
+                    print_heading(get_string("publicsitefileswarning"), "center", 2);
+                }
             }
         }
 
@@ -157,9 +175,18 @@
 
     }
 
+    function materials_public() {
+        global $materials, $wdir;
+        return ($materials and strpos("/$materials$wdir", '/.') === false);
+    }
 
-    if (! $basedir = make_upload_directory("$course->id")) {
-        error("The site administrator needs to fix the file permissions");
+    $materials_course = array();
+    if ($records = get_records('local_materials', 'course', $course->id, 'path')) {
+        foreach ($records as $record) {
+            if (file_exists($CFG->dataroot . '/materials/' . $record->path)) {
+                $materials_course[] = $record->path;
+            }
+        }
     }
 
     // make sure site files contain the backupdata or else people put backups into public area!!
@@ -169,7 +196,25 @@
         }
     }
 
+    $relbasedir = "$course->id";
     $baseweb = $CFG->wwwroot;
+
+    if ($materials) {
+        if ($id == SITEID) {
+            $materials = '/';
+            $relbasedir = "materials/";
+            $baseweb = $CFG->local_materials_url . '/';
+        } elseif (in_array($materials, $materials_course)) {
+            $relbasedir = 'materials/' . $materials;
+            $baseweb = $CFG->local_materials_url . '/' . $materials;
+        } else {
+            $materials = '';
+        }
+    }
+
+    if (! $basedir = make_upload_directory($relbasedir)) {
+        error("The site administrator needs to fix the file permissions");
+    }
 
 //  End of configuration and access control
 
@@ -182,7 +227,7 @@
         $wdir = "/".$wdir;
     }
 
-    if ($wdir == "/backupdata") {
+    if (!$materials and $wdir == "/backupdata") {
         if (! make_upload_directory("$course->id/backupdata")) {   // Backup folder
             error("Could not create backupdata folder.  The site administrator needs to fix the file permissions");
         }
@@ -195,11 +240,26 @@
 
     $url = new moodle_url(null,
                           array('id' => $id,
+                                'materials' => $materials,
                                 'wdir' => $wdir,
                                 'choose' => $choose));
 
     switch ($action) {
 
+        case "materialsadd":
+        case "materialsdel":
+            if ($materialscourse and confirm_sesskey()) {
+                $path = trim($materials.$wdir, '/');
+                if ($action == 'materialsadd') {
+                    if (!record_exists('local_materials', 'course', $materialscourse, 'path', $path)) {
+                        insert_record ('local_materials', (object) array('course' => $materialscourse, 'path' => $path));
+                    }
+                } else {
+                    delete_records('local_materials', 'course', $materialscourse, 'path', $path);
+                }
+            }
+            redirect($url->out());
+            break;
         case "upload":
             html_header($course, $wdir);
             require_once($CFG->dirroot.'/lib/uploadlib.php');
@@ -294,6 +354,7 @@
             if (($count = setfilelist($_POST)) and confirm_sesskey()) {
                 $USER->fileop     = $action;
                 $USER->filesource = $wdir;
+                $USER->filebasedir = $basedir;
                 echo "<p class=\"centerpara\">";
                 print_string("selectednowmove", "moodle", $count);
                 echo "</p>";
@@ -307,7 +368,7 @@
             if (isset($USER->fileop) and ($USER->fileop == "move") and confirm_sesskey()) {
                 foreach ($USER->filelist as $file) {
                     $shortfile = basename($file);
-                    $oldfile = $basedir.'/'.$file;
+                    $oldfile = $USER->filebasedir.'/'.$file;
                     $newfile = $basedir.$wdir."/".$shortfile;
                     if (!rename($oldfile, $newfile)) {
                         echo "<p>Error: $shortfile not moved</p>";
@@ -370,7 +431,7 @@
                 $name = clean_filename($name);
                 if (file_exists("$basedir$wdir/$name")) {
                     echo "Error: $name already exists!";
-                } else if (! make_upload_directory("$course->id$wdir/$name")) {
+                } else if (! make_upload_directory("$relbasedir$wdir/$name")) {
                     echo "Error: could not create $name";
                 }
                 displaydir($wdir);
@@ -688,6 +749,7 @@ function displaydir ($wdir) {
     global $USER, $CFG;
     global $choose;
     global $url;
+    global $materials, $materials_course, $COURSE;
 
     $fullpath = $basedir.$wdir;
     $dirlist = array();
@@ -727,6 +789,20 @@ function displaydir ($wdir) {
     $strchoose = get_string("choose");
     $strfolder = get_string("folder");
     $strfile   = get_string("file");
+
+    if ($id == SITEID) {
+        $options = array('' => get_string('sitefiles'),
+                         '/' => 'Materials: ' . ($materials ? $wdir : '/'));
+    } else {
+        $options = array('' => get_string('files'));
+        foreach ($materials_course as $path) {
+            $options[$path] = 'Materials: ' . $path;
+        }
+    }
+    echo '<form style="margin-bottom: 10px">';
+    echo $url->hidden_params_out(array('materials', 'wdir'));
+    choose_from_menu ($options, "materials", $materials, "", "javascript:this.form.submit()");
+    echo '</form>';
 
     echo "<form action=\"index.php\" method=\"post\" id=\"dirform\">";
     echo "<div>";
@@ -808,10 +884,16 @@ function displaydir ($wdir) {
             print_cell("center", "<input type=\"checkbox\" name=\"file$count\" value=\"$fileurl\" />", 'checkbox');
             echo "<td align=\"left\" style=\"white-space:nowrap\" class=\"name\">";
 
-            $ffurl = get_file_url($id.'/'.$fileurl);
-            link_to_popup_window ($ffurl, "display",
-                                  "<img src=\"$CFG->pixpath/f/$icon\" class=\"icon\" alt=\"$strfile\" />&nbsp;".htmlspecialchars($file),
-                                  480, 640);
+            if ($materials) {
+                $ffurl = $CFG->local_materials_url . '/' . trim($materials, '/') . '/' . trim($fileurl, '/');
+                echo "<a href=\"$ffurl\"><img src=\"$CFG->pixpath/f/$icon\" class=\"icon\" alt=\"$strfile\" />&nbsp;".htmlspecialchars($file).'</a>';
+                $selectfile = $ffurl;
+            } else {
+                $ffurl = get_file_url($id.'/'.$fileurl);
+                link_to_popup_window ($ffurl, "display",
+                                      "<img src=\"$CFG->pixpath/f/$icon\" class=\"icon\" alt=\"$strfile\" />&nbsp;".htmlspecialchars($file),
+                                      480, 640);
+            }
             echo "</td>";
 
             $file_size = filesize($filename);
@@ -830,7 +912,7 @@ function displaydir ($wdir) {
                 $edittext .= "<a href=\"" . $url->out_action(array('file' => $fileurl, 'action' => 'unzip')) . "\">$strunzip</a>&nbsp;";
                 $edittext .= "<a href=\"" . $url->out_action(array('file' => $fileurl, 'action' => 'listzip')) . "\">$strlist</a> ";
                 if (!empty($CFG->backup_version) and has_capability('moodle/site:restore', get_context_instance(CONTEXT_COURSE, $id))) {
-                    $edittext .= "<a href=\"" . $url->out_action(array('file' => $fileurl, 'action' => 'restore')) . "\">$strrestore</a> ";
+                    $edittext .= "<a href=\"" . $url->out_action(array('file' => $filesafe, 'action' => 'restore')) . "\">$strrestore</a> ";
                 }
             }
 
@@ -869,7 +951,7 @@ function displaydir ($wdir) {
     echo "</form>";
     echo "<table border=\"0\" cellspacing=\"2\" cellpadding=\"2\" width=\"640\"><tr>";
     echo "<td align=\"center\">";
-    if (!empty($USER->fileop) and ($USER->fileop == "move") and ($USER->filesource <> $wdir)) {
+    if (!empty($USER->fileop) and ($USER->fileop == "move") and ($USER->filesource != $wdir or $USER->filebasedir != $basedir)) {
         echo "<form action=\"index.php\" method=\"get\">";
         echo "<div>";
         echo $url->hidden_params_out(array(), 0,
@@ -909,6 +991,41 @@ function displaydir ($wdir) {
     echo "</table>";
     echo "<hr/>";
     //echo "<hr width=\"640\" align=\"center\" noshade=\"noshade\" size=\"1\" />";
+
+    if ($materials and ($materials != '/' or $wdir != '/')) {
+        echo '<div>';
+        print_heading(get_string('courses'));
+        $path = trim($materials.$wdir, '/');
+        $sql = "SELECT c.id, c.shortname, c.fullname"
+            . " FROM {$CFG->prefix}local_materials m, {$CFG->prefix}course c"
+            . " WHERE m.path = '$path' AND m.course = c.id"
+            . " ORDER BY c.shortname";
+        $admin = has_capability('moodle/course:managefiles',
+                                get_context_instance(CONTEXT_COURSE, SITEID));
+        if ($records = get_records_sql($sql)) {
+            foreach ($records as $record) {
+                echo $record->shortname . ' - ' . $record->fullname;
+                if ($admin) {
+                    $params = array('action' => 'materialsdel',
+                                    'materialscourse' => $record->id);
+                    echo ' <a href="' . $url->out_action($params) . '"><img src="'
+                        . $CFG->pixpath . '/t/delete.gif" class="iconsmall edit" alt="'
+                        . get_string('delete') . '" /></a>';
+                }
+                echo '<br/>';
+            }
+        }
+        if ($admin) {
+            $options = get_records_menu('course', '', '', 'shortname' , "id, CONCAT(shortname, ' - ', fullname)");
+            echo "<form action=\"index.php\" method=\"get\">";
+            echo $url->hidden_params_out(array(), 0,
+                                         array('action' => 'materialsadd',
+                                               'sesskey' => sesskey()));
+            choose_from_menu ($options, 'materialscourse', '', get_string('add') .'...', 'this.form.submit()');
+            echo '</form>';
+        }
+        echo '</div>';
+    }
 
 }
 

@@ -197,6 +197,8 @@ class block_admin extends block_list {
         if ($course->id !== SITEID and has_capability('moodle/course:managefiles', $context)) {
             $this->content->items[]='<a href="'.$CFG->wwwroot.'/files/index.php?id='.$this->instance->pageid.'">'.get_string('files').'</a>';
             $this->content->icons[]='<img src="'.$CFG->pixpath.'/i/files.gif" class="icon" alt="" />';
+            $this->content->items[]='<a href="'.$CFG->wwwroot.'/files/index.php?id='.$this->instance->pageid.'&amp;materials='.$course->shortname.'">'."Materials".'</a>';
+            $this->content->icons[]='<img src="'.$CFG->pixpath.'/i/files.gif" class="icon" alt="" />';
         }
 
     /// Authorize hooks
