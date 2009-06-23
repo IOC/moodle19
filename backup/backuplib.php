@@ -243,7 +243,7 @@
             $backupdata_dir = "backupdata";
             foreach ($coursedirs as $dir) {
                 //Check it isn't backupdata_dir
-                if (strpos($dir,$backupdata_dir)!==0) {
+                if (strpos($dir,$backupdata_dir)!==0 and strpos($dir,'email')!==0) {
                     //Insert them into backup_files
                     $status = execute_sql("INSERT INTO {$CFG->prefix}backup_files
                                                   (backup_code, file_type, path)
@@ -2543,7 +2543,7 @@
             if ($list) {
                 //Iterate
                 foreach ($list as $dir) {
-                    if ($dir !== $name_moddata and $dir !== $name_backupdata) {
+                    if ($dir !== $name_moddata and $dir !== $name_backupdata and $dir !== 'email') {
                         $status = backup_copy_file($rootdir."/".$dir,
                                        $CFG->dataroot."/temp/backup/".$preferences->backup_unique_code."/course_files/".$dir);
                     }
