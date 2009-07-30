@@ -48,6 +48,7 @@
 
     function html_header($course, $wdir, $formfield=""){
         global $CFG, $ME, $choose;
+        global $url;
 
         $navlinks = array();
         // $navlinks[] = array('name' => $course->shortname, 'link' => "../course/view.php?id=$course->id", 'type' => 'misc');
@@ -65,13 +66,13 @@
             $numdirs = count($dirs);
             $link = "";
             $navlinks[] = array('name' => $strfiles,
-                                'link' => $ME."?id=$course->id&amp;wdir=/&amp;choose=$choose",
+                                'link' => $url->out(false, array('wdir'=> '/')),
                                 'type' => 'misc');
 
             for ($i=1; $i<$numdirs-1; $i++) {
-                $link .= "/".urlencode($dirs[$i]);
+                $link .= "/".$dirs[$i];
                 $navlinks[] = array('name' => $dirs[$i],
-                                    'link' => $ME."?id=$course->id&amp;wdir=$link&amp;choose=$choose",
+                                    'link' => $url->out(false, array('wdir' => $link)),
                                     'type' => 'misc');
             }
             $navlinks[] = array('name' => $dirs[$numdirs-1], 'link' => null, 'type' => 'misc');
@@ -88,7 +89,7 @@
             <script type="text/javascript">
             //<![CDATA[
             function set_value(txt) {
-                opener.document.forms['<?php echo $chooseparts[0]."'].".$chooseparts[1] ?>.value = txt;
+                opener.document.forms['<?php echo $chooseparts[0]; ?>'].<?php echo $chooseparts[1]; ?>.value = txt;
                 window.close();
             }
             //]]>
@@ -192,6 +193,11 @@
         error("Requested directory does not exist.", "$CFG->wwwroot/files/index.php?id=$id");
     }
 
+    $url = new moodle_url(null,
+                          array('id' => $id,
+                                'wdir' => $wdir,
+                                'choose' => $choose));
+
     switch ($action) {
 
         case "upload":
@@ -220,11 +226,9 @@
                 echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"index.php\">";
                 echo "<div>";
                 echo "<table><tr><td colspan=\"2\">";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"upload\" />";
-                echo " <input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'upload',
+                                                   'sesskey' => sesskey()));
                 upload_print_form_fragment(1,array('userfile'),null,false,null,$upload_max_filesize,0,false);
                 echo " </td></tr></table>";
                 echo " <input type=\"submit\" name=\"save\" value=\"$struploadthisfile\" />";
@@ -232,10 +236,8 @@
                 echo "</form>";
                 echo "<form action=\"index.php\" method=\"get\">";
                 echo "<div>";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"cancel\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'cancel'));
                 echo " <input type=\"submit\" value=\"$strcancel\" />";
                 echo "</div>";
                 echo "</form>";
@@ -272,14 +274,13 @@
                     $block = resource_delete_warning($course, $USER->filelist);
 
                     if (empty($CFG->resource_blockdeletingfile) or $block == '') {
-                        $optionsyes = array('id'=>$id, 'wdir'=>$wdir, 'action'=>'delete', 'confirm'=>1, 'sesskey'=>sesskey(), 'choose'=>$choose);
-                        $optionsno  = array('id'=>$id, 'wdir'=>$wdir, 'action'=>'cancel', 'choose'=>$choose);
+                        $optionsyes = array('action'=>'delete', 'confirm'=>1, 'sesskey'=>sesskey()) + $url->params();
+                        $optionsno  = array('action'=>'cancel') + $url->params();
                         notice_yesno (get_string('deletecheckfiles'), 'index.php', 'index.php', $optionsyes, $optionsno, 'post', 'get');
                     } else {
 
                         notify(get_string('warningblockingdelete', 'resource'));
-                        $options  = array('id'=>$id, 'wdir'=>$wdir, 'action'=>'cancel', 'choose'=>$choose);
-                        print_continue("index.php?id=$id&amp;wdir=$wdir&amp;action=cancel&amp;choose=$choose");
+                        print_continue($url->out(false, array('action' => 'cancel')));
                     }
                 } else {
                     displaydir($wdir);
@@ -342,12 +343,10 @@
                 echo "<table><tr><td>";
                 echo "<form action=\"index.php\" method=\"post\">";
                 echo "<fieldset class=\"invisiblefieldset\">";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"rename\" />";
-                echo " <input type=\"hidden\" name=\"oldname\" value=\"$file\" />";
-                echo " <input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'rename',
+                                                   'oldname' => $file,
+                                                   'sesskey' => sesskey()));
                 echo " <input type=\"text\" name=\"name\" size=\"35\" value=\"$file\" />";
                 echo " <input type=\"submit\" value=\"$strrename\" />";
                 echo "</fieldset>";
@@ -355,10 +354,8 @@
                 echo "</td><td>";
                 echo "<form action=\"index.php\" method=\"get\">";
                 echo "<div>";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"cancel\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'cancel'));
                 echo " <input type=\"submit\" value=\"$strcancel\" />";
                 echo "</div>";
                 echo "</form>";
@@ -387,22 +384,18 @@
                 echo "<table><tr><td>";
                 echo "<form action=\"index.php\" method=\"post\">";
                 echo "<fieldset class=\"invisiblefieldset\">";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"makedir\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'makedir',
+                                                   'sesskey' => sesskey()));
                 echo " <input type=\"text\" name=\"name\" size=\"35\" />";
-                echo " <input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
                 echo " <input type=\"submit\" value=\"$strcreate\" />";
                 echo "</fieldset>";
                 echo "</form>";
                 echo "</td><td>";
                 echo "<form action=\"index.php\" method=\"get\">";
                 echo "<div>";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"cancel\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'cancel'));
                 echo " <input type=\"submit\" value=\"$strcancel\" />";
                 echo "</div>";
                 echo "</form>";
@@ -438,12 +431,10 @@
                 echo "<table><tr><td colspan=\"2\">";
                 echo "<form action=\"index.php\" method=\"post\">";
                 echo "<div>";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"file\" value=\"$file\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"edit\" />";
-                echo " <input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('file' => $file,
+                                                   'action' => 'edit',
+                                                   'sesskey' => sesskey()));
                 print_textarea($usehtmleditor, 25, 80, 680, 400, "text", $contents);
                 echo "</td></tr><tr><td>";
                 echo " <input type=\"submit\" value=\"".get_string("savechanges")."\" />";
@@ -452,10 +443,8 @@
                 echo "</td><td>";
                 echo "<form action=\"index.php\" method=\"get\">";
                 echo "<div>";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"cancel\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'cancel'));
                 echo " <input type=\"submit\" value=\"".get_string("cancel")."\" />";
                 echo "</div>";
                 echo "</form>";
@@ -500,22 +489,18 @@
                     echo "<table><tr><td>";
                     echo "<form action=\"index.php\" method=\"post\">";
                     echo "<fieldset class=\"invisiblefieldset\">";
-                    echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                    echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                    echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                    echo " <input type=\"hidden\" name=\"action\" value=\"zip\" />";
+                    echo $url->hidden_params_out(array(), 0,
+                                                 array('action' => 'zip',
+                                                       'sesskey' => sesskey()));
                     echo " <input type=\"text\" name=\"name\" size=\"35\" value=\"new.zip\" />";
-                    echo " <input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
                     echo " <input type=\"submit\" value=\"".get_string("createziparchive")."\" />";
-                    echo "<fieldset>";
+                    echo "</fieldset>";
                     echo "</form>";
                     echo "</td><td>";
                     echo "<form action=\"index.php\" method=\"get\">";
                     echo "<div>";
-                    echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                    echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                    echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                    echo " <input type=\"hidden\" name=\"action\" value=\"cancel\" />";
+                    echo $url->hidden_params_out(array(), 0,
+                                                 array('action' => 'cancel'));
                     echo " <input type=\"submit\" value=\"".get_string("cancel")."\" />";
                     echo "</div>";
                     echo "</form>";
@@ -544,10 +529,8 @@
 
                 echo "<div style=\"text-align:center\"><form action=\"index.php\" method=\"get\">";
                 echo "<div>";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"cancel\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'cancel'));
                 echo " <input type=\"submit\" value=\"$strok\" />";
                 echo "</div>";
                 echo "</form>";
@@ -594,10 +577,8 @@
                 }
                 echo "<br /><center><form action=\"index.php\" method=\"get\">";
                 echo "<div>";
-                echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-                echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-                echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-                echo " <input type=\"hidden\" name=\"action\" value=\"cancel\" />";
+                echo $url->hidden_params_out(array(), 0,
+                                             array('action' => 'cancel'));
                 echo " <input type=\"submit\" value=\"$strok\" />";
                 echo "</div>";
                 echo "</form>";
@@ -620,7 +601,7 @@
                 $restore_path = "$CFG->wwwroot/backup/restore.php";
                 notice_yesno (get_string("areyousuretorestorethis"),
                                 $restore_path."?id=".$id."&amp;file=".cleardoubleslashes($id.$wdir."/".$file)."&amp;method=manual",
-                                "index.php?id=$id&amp;wdir=$wdir&amp;action=cancel");
+                              $url->out(false, array('action' => 'cancel')));
             } else {
                 displaydir($wdir);
             }
@@ -706,6 +687,7 @@ function displaydir ($wdir) {
     global $id;
     global $USER, $CFG;
     global $choose;
+    global $url;
 
     $fullpath = $basedir.$wdir;
     $dirlist = array();
@@ -746,10 +728,8 @@ function displaydir ($wdir) {
     $strfolder = get_string("folder");
     $strfile   = get_string("file");
 
-
     echo "<form action=\"index.php\" method=\"post\" id=\"dirform\">";
     echo "<div>";
-    echo '<input type="hidden" name="choose" value="'.$choose.'" />';
     // echo "<hr align=\"center\" noshade=\"noshade\" size=\"1\" />";
     echo "<hr/>";
     echo "<table border=\"0\" cellspacing=\"2\" cellpadding=\"2\" width=\"640\" class=\"files\">";
@@ -776,7 +756,7 @@ function displaydir ($wdir) {
                 $fileurl = rawurlencode(dirname($wdir));
                 print_cell();
                 // alt attribute intentionally empty to prevent repetition in screen reader
-                print_cell('left', '<a href="index.php?id='.$id.'&amp;wdir='.$fileurl.'&amp;choose='.$choose.'"><img src="'.$CFG->pixpath.'/f/parent.gif" class="icon" alt="" />&nbsp;'.get_string('parentfolder').'</a>', 'name');
+                print_cell('left', '<a href="'. $url->out(false, array('wdir' => dirname($wdir))) .'"><img src="'.$CFG->pixpath.'/f/parent.gif" class="icon" alt="" />&nbsp;'.get_string('parentfolder').'</a>', 'name');
                 print_cell();
                 print_cell();
                 print_cell();
@@ -793,13 +773,13 @@ function displaydir ($wdir) {
                 } else {
                     print_cell("center", "<input type=\"checkbox\" name=\"file$count\" value=\"$fileurl\" />", 'checkbox');
                 }
-                print_cell("left", "<a href=\"index.php?id=$id&amp;wdir=$fileurl&amp;choose=$choose\"><img src=\"$CFG->pixpath/f/folder.gif\" class=\"icon\" alt=\"$strfolder\" />&nbsp;".htmlspecialchars($dir)."</a>", 'name');
+                print_cell("left", "<a href=\"" . $url->out(false, array('wdir' => "$wdir/$dir")) . "\"><img src=\"$CFG->pixpath/f/folder.gif\" class=\"icon\" alt=\"$strfolder\" />&nbsp;".htmlspecialchars($dir)."</a>", 'name');
                 print_cell("right", $filesize, 'size');
                 print_cell("right", $filedate, 'date');
                 if ($wdir.$dir === '/moddata') {
                     print_cell();
                 } else { 
-                    print_cell("right", "<a href=\"index.php?id=$id&amp;wdir=$wdir&amp;file=$filesafe&amp;action=rename&amp;choose=$choose\">$strrename</a>", 'commands');
+                    print_cell("right", "<a href=\"" . $url->out(false, array('file' => $dir, 'action' => 'rename')) . "\">$strrename</a>", 'commands');
                 }
             }
 
@@ -844,18 +824,17 @@ function displaydir ($wdir) {
                 $edittext = '';
             }
 
-
             if ($icon == "text.gif" || $icon == "html.gif") {
-                $edittext .= "<a href=\"index.php?id=$id&amp;wdir=$wdir&amp;file=$fileurl&amp;action=edit&amp;choose=$choose\">$stredit</a>";
+                $edittext .= "<a href=\"" . $url->out(false, array('file' => $fileurl, 'action' => 'edit')) . "\">$stredit</a>";
             } else if ($icon == "zip.gif") {
-                $edittext .= "<a href=\"index.php?id=$id&amp;wdir=$wdir&amp;file=$fileurl&amp;action=unzip&amp;sesskey=$USER->sesskey&amp;choose=$choose\">$strunzip</a>&nbsp;";
-                $edittext .= "<a href=\"index.php?id=$id&amp;wdir=$wdir&amp;file=$fileurl&amp;action=listzip&amp;sesskey=$USER->sesskey&amp;choose=$choose\">$strlist</a> ";
+                $edittext .= "<a href=\"" . $url->out_action(array('file' => $fileurl, 'action' => 'unzip')) . "\">$strunzip</a>&nbsp;";
+                $edittext .= "<a href=\"" . $url->out_action(array('file' => $fileurl, 'action' => 'listzip')) . "\">$strlist</a> ";
                 if (!empty($CFG->backup_version) and has_capability('moodle/site:restore', get_context_instance(CONTEXT_COURSE, $id))) {
-                    $edittext .= "<a href=\"index.php?id=$id&amp;wdir=$wdir&amp;file=$filesafe&amp;action=restore&amp;sesskey=$USER->sesskey&amp;choose=$choose\">$strrestore</a> ";
+                    $edittext .= "<a href=\"" . $url->out_action(array('file' => $fileurl, 'action' => 'restore')) . "\">$strrestore</a> ";
                 }
             }
 
-            print_cell("right", "$edittext <a href=\"index.php?id=$id&amp;wdir=$wdir&amp;file=$filesafe&amp;action=rename&amp;choose=$choose\">$strrename</a>", 'commands');
+            print_cell("right", "$edittext <a href=\"" . $url->out(false, array('file' => $file, 'action' => 'rename')) . "\">$strrename</a>", 'commands');
 
             echo "</tr>";
         }
@@ -866,10 +845,8 @@ function displaydir ($wdir) {
 
     echo "<table border=\"0\" cellspacing=\"2\" cellpadding=\"2\" width=\"640\">";
     echo "<tr><td>";
-    echo "<input type=\"hidden\" name=\"id\" value=\"$id\" />";
-    echo '<input type="hidden" name="choose" value="'.$choose.'" />';
-    echo "<input type=\"hidden\" name=\"wdir\" value=\"$wdir\" /> ";
-    echo "<input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
+    echo $url->hidden_params_out(array(), 0,
+                                 array('sesskey' => sesskey()));
     $options = array (
                    "move" => "$strmovetoanotherfolder",
                    "delete" => "$strdeletecompletely",
@@ -895,11 +872,9 @@ function displaydir ($wdir) {
     if (!empty($USER->fileop) and ($USER->fileop == "move") and ($USER->filesource <> $wdir)) {
         echo "<form action=\"index.php\" method=\"get\">";
         echo "<div>";
-        echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-        echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-        echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-        echo " <input type=\"hidden\" name=\"action\" value=\"paste\" />";
-        echo " <input type=\"hidden\" name=\"sesskey\" value=\"$USER->sesskey\" />";
+        echo $url->hidden_params_out(array(), 0,
+                                     array('action' => 'paste',
+                                           'sesskey' => sesskey()));
         echo " <input type=\"submit\" value=\"$strmovefilestohere\" />";
         echo "</div>";
         echo "</form>";
@@ -908,10 +883,8 @@ function displaydir ($wdir) {
     echo "<td align=\"right\">";
         echo "<form action=\"index.php\" method=\"get\">";
         echo "<div>";
-        echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-        echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-        echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-        echo " <input type=\"hidden\" name=\"action\" value=\"makedir\" />";
+        echo $url->hidden_params_out(array(), 0,
+                                     array('action' => 'makedir'));
         echo " <input type=\"submit\" value=\"$strmakeafolder\" />";
         echo "</div>";
         echo "</form>";
@@ -927,10 +900,8 @@ function displaydir ($wdir) {
     echo "<td align=\"right\">";
         echo "<form action=\"index.php\" method=\"get\">";
         echo "<div>";
-        echo ' <input type="hidden" name="choose" value="'.$choose.'" />';
-        echo " <input type=\"hidden\" name=\"id\" value=\"$id\" />";
-        echo " <input type=\"hidden\" name=\"wdir\" value=\"$wdir\" />";
-        echo " <input type=\"hidden\" name=\"action\" value=\"upload\" />";
+        echo $url->hidden_params_out(array(), 0,
+                                     array('action' => 'upload'));
         echo " <input type=\"submit\" value=\"$struploadafile\" />";
         echo "</div>";
         echo "</form>";
