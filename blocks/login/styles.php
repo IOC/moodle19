@@ -7,7 +7,7 @@
 }
 
 .block_login .loginform .fld input {
-  width:5em;
+  width:7em;
 }
 
 .block_login .loginform label {
