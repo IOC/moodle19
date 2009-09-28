@@ -114,7 +114,7 @@
         redirect("view.php?id=$cm->id&amp;mode=$mode&amp;search=&amp;advanced=1");
     }
 
-    $advanced = optional_param('advanced', -1, PARAM_INT);
+    $advanced = 0;
     if ($advanced == -1) {
         $advanced = $SESSION->dataprefs[$data->id]['advanced'];
     } else {
