@@ -1049,7 +1049,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
     echo '<div>';
     echo '<input type="hidden" name="d" value="'.$data->id.'" />';
     if ($mode =='asearch') {
-        $advanced = 1;
+        $advanced = 0;
         echo '<input type="hidden" name="mode" value="list" />';
     }
     echo '<label for="pref_perpage">'.get_string('pagesize','data').'</label> ';
@@ -1148,7 +1148,6 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
         </script>';
     echo '&nbsp;<input type="hidden" name="advanced" value="0" />';
     echo '&nbsp;<input type="hidden" name="filter" value="1" />';
-    echo '&nbsp;<input type="checkbox" id="advancedcheckbox" name="advanced" value="1" '.$checked.' onchange="showHideAdvSearch(this.checked);" /><label for="advancedcheckbox">'.get_string('advancedsearch', 'data').'</label>';
     echo '&nbsp;<input type="submit" value="'.get_string('savesettings','data').'" />';
     echo '<br />';
     echo '<div class="dataadvancedsearch" id="data_adv_form" style="display: ';
