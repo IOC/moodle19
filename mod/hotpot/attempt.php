@@ -60,7 +60,6 @@
     $quiztype = optional_param('quiztype', 0, PARAM_INT);
 
     if (empty($attempt->details)) {
-        hotpot_set_attempt_details($attempt);
         $javascript_is_off = true;
     } else {
         $javascript_is_off = false;
@@ -97,9 +96,6 @@
                 unset($details);
                 $details->attempt = $attempt->id;
                 $details->details = $attempt->details;
-                if (! insert_record("hotpot_details", $details, false)) {
-                    error("Could not insert attempt details record: ".$db->ErrorMsg(), $next_url);
-                }
             }
         } else {
             // remove previous responses for this attempt, if required
@@ -140,9 +136,6 @@
             unset($details);
             $details->attempt = $attempt->id;
             $details->details = $attempt->details;
-            if (! insert_record("hotpot_details", $details)) {
-                error("Could not insert attempt details record: ".$db->ErrorMsg(), $next_url);
-            }
         }
     }
 
