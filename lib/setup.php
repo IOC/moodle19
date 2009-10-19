@@ -152,14 +152,14 @@ global $HTTPSPAGEREQUIRED;
             header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable');        
         }
         // and then for human consumption...
-        echo '<html><body>';
+        echo '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>';
         echo '<table align="center"><tr>';
         echo '<td style="color:#990000; text-align:center; font-size:large; border-width:1px; '.
              '    border-color:#000000; border-style:solid; border-radius: 20px; border-collapse: collapse; '.
              '    -moz-border-radius: 20px; padding: 15px">';
-        echo '<p>Error: Database connection failed.</p>';
-        echo '<p>It is possible that the database is overloaded or otherwise not running properly.</p>';
-        echo '<p>The site administrator should also check that the database details have been correctly specified in config.php</p>';
+        echo "<p>Per problemes tècnics, el campus de l'IOC no està disponible.<p>";
+        echo "<p>Si heu de fer algun lliurament, el professorat tindrà en compte la incidència.<p>";
+        echo "<p>Disculpeu les molèsties.</p>";
         echo '</td></tr></table>';
         echo '</body></html>';
 
