@@ -109,10 +109,16 @@ class block_quiz_results extends block_base {
             $groupmode = VISIBLEGROUPS;
         }
 
+        $groupingid = 0;
+        if (!empty($CFG->enablegroupings)) {
+            $cm = get_coursemodule_from_instance('quiz', $quizid);
+            $groupingid = $cm->groupingid;
+        }
+
         switch($groupmode) {
             case VISIBLEGROUPS:
             // Display group-mode results
-            $groups = groups_get_all_groups($courseid);
+            $groups = groups_get_all_groups($courseid, 0, $groupingid);
 
             if(empty($groups)) {
                 // No groups exist, sorry
@@ -130,6 +136,7 @@ class block_quiz_results extends block_base {
             $groupofuser = get_records_sql(
             'SELECT m.userid, m.groupid, g.name FROM '.$CFG->prefix.'groups g LEFT JOIN '.$CFG->prefix.'groups_members m ON g.id = m.groupid '.
             'WHERE g.courseid = '.$courseid.' AND m.userid IN ('.implode(',', $userids).')'
+            . ' AND g.id IN (' . implode(',', array_keys($groups)) . ')'
             );
 
             $groupgrades = array();
@@ -276,7 +283,7 @@ class block_quiz_results extends block_base {
                 return $this->content;
             }
 
-            $mygroups = groups_get_all_groups($courseid, $USER->id);
+            $mygroups = groups_get_all_groups($courseid, $USER->id, $groupingid);
             if(empty($mygroups)) {
                 // Not member of a group, show nothing
                 return $this->content;
