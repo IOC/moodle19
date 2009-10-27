@@ -25,4 +25,8 @@ $settings->add(new admin_setting_configcheckbox('filter_mediaplugin_enable_youtu
 $settings->add(new admin_setting_configcheckbox('filter_mediaplugin_enable_ogg', get_string('mediapluginogg','admin'), '', 1));
 
 $settings->add(new admin_setting_configcheckbox('filter_mediaplugin_enable_ogv', get_string('mediapluginogv','admin'), '', 1));
+
+$settings->add(new admin_setting_configcheckbox('filter_mediaplugin_enable_vimeo', get_string('mediapluginvimeo','admin'), '', 0));
+
+$settings->add(new admin_setting_configcheckbox('filter_mediaplugin_enable_tv3', get_string('mediaplugintv3','admin'), '', 0));
 ?>
