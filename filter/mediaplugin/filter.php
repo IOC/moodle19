@@ -113,6 +113,16 @@ function mediaplugin_filter($courseid, $text) {
         $newtext = preg_replace_callback($search, 'mediaplugin_filter_youtube_callback', $newtext);
     }
 
+    if (!empty($CFG->filter_mediaplugin_enable_vimeo)) {
+        $search = '/<a\s[^>]*href="https?:\/\/(?:www\.)?vimeo.com\/([0-9]+)"[^>]*>(.*?)<\/a>/is';
+        $newtext = preg_replace_callback($search, 'mediaplugin_filter_vimeo_callback', $newtext);
+    }
+
+    if (!empty($CFG->filter_mediaplugin_enable_tv3)) {
+        $search = '/<a\s[^>]*href="http:\/\/www\.tv3\.cat\/(?:3alacarta\/#\/)?videos\/([0-9]+)(?:\/[^"]*)?"[^>]*>(.*?)<\/a>/is';
+        $newtext = preg_replace_callback($search, 'mediaplugin_filter_tv3_callback', $newtext);
+    }
+
     if (is_null($newtext) or $newtext === $text) {
         // error or not filtered
         return $text;
@@ -382,6 +392,38 @@ function mediaplugin_filter_qt_callback($link, $autostart=false) {
   </object>
 <!--<![endif]-->
 </object></span>';
+}
+
+/**
+ * Change links to Vimeo into embedded Vimeo videos
+ */
+function mediaplugin_filter_vimeo_callback($link, $autostart=false) {
+    return '<object title="' . s($link[2]) . '" width="425" height="344" type="application/x-shockwave-flash"'
+        . ' data="http://vimeo.com/moogaloop.swf?clip_id='
+        . $link[1] . '&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;'
+        . 'show_portrait=0&amp;color=&amp;fullscreen=1">'
+        . '<param name="allowfullscreen" value="true" />'
+        . '<param name="allowscriptaccess" value="always" />'
+         .  $link[0] . '</object>';
+}
+
+/**
+ * Change links to TV3 videos into embedded TV3 videos
+ */
+function mediaplugin_filter_tv3_callback($link, $autostart=false) {
+    return '<object title="' . s($link[2]) . '" type="application/x-shockwave-flash"'
+        . ' data="http://www.tv3.cat/ria/players/3ac/evp/Main.swf"'
+        . ' width="640" height="398" id="EVP' . $link[1] . 'IE">'
+        . ' <param name="movie" value="http://www.tv3.cat/ria/players/3ac/evp/Main.swf"></param>'
+        . ' <param name="scale" value="noscale"></param>'
+        . ' <param name="align" value="tl"></param>'
+        . ' <param name="swliveconnect" value="true"></param>'
+        . ' <param name="menu" value="true"></param>'
+        . ' <param name="allowFullScreen" value="true"></param>'
+        . ' <param name="allowScriptAccess" value="always"></param>'
+        . ' <param name="wmode" value="transparent"></param>'
+        . ' <param name="FlashVars" value="themepath=themes/evp_advanced.swf&amp;videoid=' . $link[1]. '&amp;subtitols=true&amp;refreshlock=true&amp;haspodcast=true&amp;controlbar=true&amp;basepath=http://www.tv3.cat/ria/players/3ac/evp/&amp;backgroundColor=#ffffff&amp;opcions=true&amp;comentaris=false&amp;votacions=true&amp;relacionats=true&amp;hasinsereix=true&amp;instancename=playerEVP_0_' . $link[1] . '&amp;hassinopsi=true&amp;hascomparteix=true&amp;hasrss=true&amp;mesi=true&amp;hasenvia=true&amp;minimal=false&amp;autostart=false&amp;relacionats_canals=true&amp;basepath=http://www.tv3.cat/ria/players/3ac/evp/&amp;xtm=true"></param>'
+        .  $link[0] . '</object>';
 }
 
 ?>
