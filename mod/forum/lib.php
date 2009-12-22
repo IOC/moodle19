@@ -204,7 +204,7 @@ function forum_delete_instance($id) {
 
     if ($discussions = get_records('forum_discussions', 'forum', $forum->id)) {
         foreach ($discussions as $discussion) {
-            if (!forum_delete_discussion($discussion, true)) {
+            if (!forum_delete_discussion($discussion, true, false)) {
                 $result = false;
             }
         }
@@ -4069,7 +4069,7 @@ function forum_add_discussion($discussion,&$message) {
 /**
  *
  */
-function forum_delete_discussion($discussion, $fulldelete=false) {
+function forum_delete_discussion($discussion, $fulldelete=false, $deleteread=true) {
 // $discussion is a discussion record object
 
     $result = true;
@@ -4081,13 +4081,15 @@ function forum_delete_discussion($discussion, $fulldelete=false) {
             if (! delete_records("forum_ratings", "post", "$post->id")) {
                 $result = false;
             }
-            if (! forum_delete_post($post, $fulldelete)) {
+            if (! forum_delete_post($post, $fulldelete, false)) {
                 $result = false;
             }
         }
     }
 
-    forum_tp_delete_read_records(-1, -1, $discussion->id);
+    if ($deleteread) {
+        forum_tp_delete_read_records(-1, -1, $discussion->id);
+    }
 
     if (! delete_records("forum_discussions", "id", "$discussion->id")) {
         $result = false;
@@ -4100,11 +4102,11 @@ function forum_delete_discussion($discussion, $fulldelete=false) {
 /**
  *
  */
-function forum_delete_post($post, $children=false) {
+function forum_delete_post($post, $children=false, $deleteread=true) {
    if ($childposts = get_records('forum_posts', 'parent', $post->id)) {
        if ($children) {
            foreach ($childposts as $childpost) {
-               forum_delete_post($childpost, true);
+               forum_delete_post($childpost, true, $deleteread);
            }
        } else {
            return false;
@@ -4113,7 +4115,9 @@ function forum_delete_post($post, $children=false) {
    if (delete_records("forum_posts", "id", $post->id)) {
        delete_records("forum_ratings", "post", $post->id);  // Just in case
 
-       forum_tp_delete_read_records(-1, $post->id);
+       if ($deleteread) {
+           forum_tp_delete_read_records(-1, $post->id);
+       }
 
        if ($post->attachment) {
            $discussion = get_record("forum_discussions", "id", $post->discussion);
