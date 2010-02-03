@@ -1106,6 +1106,15 @@ function forum_print_overview($courses,&$htmlarray) {
         }
     }
 
+    $sql = "SELECT g.id FROM {$CFG->prefix}groups g"
+        . " JOIN {$CFG->prefix}groups_members gm ON gm.groupid = g.id"
+        . " WHERE gm.userid = {$USER->id} AND g.courseid IN ("
+        . implode(',', array_keys($courses)) . ")";
+    $records = get_records_sql($sql);
+    $groups = $records ? array_keys($records) : array();
+    $groups[] = 0;
+    $groups[] = -1;
+
     if (count($trackingforums) > 0) {
         $cutoffdate = isset($CFG->forum_oldpostdays) ? (time() - ($CFG->forum_oldpostdays*24*60*60)) : 0;
         $sql = 'SELECT d.forum,d.course,COUNT(p.id) AS count '.
@@ -1113,10 +1122,12 @@ function forum_print_overview($courses,&$htmlarray) {
             ' JOIN '.$CFG->prefix.'forum_discussions d ON p.discussion = d.id '.
             ' LEFT JOIN '.$CFG->prefix.'forum_read r ON r.postid = p.id AND r.userid = '.$USER->id.' WHERE (';
         foreach ($trackingforums as $track) {
-            $sql .= '(d.forum = '.$track->id.' AND (d.groupid = -1 OR d.groupid = 0 OR d.groupid = '.get_current_group($track->course).')) OR ';
+            $sql .= 'd.forum = '.$track->id.' OR ';
         }
         $sql = substr($sql,0,-3); // take off the last OR
-        $sql .= ') AND p.modified >= '.$cutoffdate.' AND r.id is NULL GROUP BY d.forum,d.course';
+        $sql .= ') AND p.modified >= '.$cutoffdate.' AND r.id is NULL'
+            . ' AND d.groupid IN (' . implode(',', $groups) . ')'
+            . ' GROUP BY d.forum,d.course';
 
         if (!$unread = get_records_sql($sql)) {
             $unread = array();
