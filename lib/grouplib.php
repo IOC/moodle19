@@ -495,9 +495,31 @@ function groups_print_activity_menu($cm, $urlroot, $return=false, $hideallpartic
         $groupsmenu[0] = get_string('allparticipants');
     }
 
+    $unread = false;
+    if ($allowedgroups and record_exists('modules', 'id', $cm->module, 'name', 'forum')) {
+        $forum = get_record('forum', 'id', $cm->instance);
+        if (forum_tp_can_track_forums($forum)) {
+            $groupids = implode(',', array_keys($allowedgroups));
+            $cutoffdate = isset($CFG->forum_oldpostdays) ? (time() - ($CFG->forum_oldpostdays*24*60*60)) : 0;
+            $sql = 'SELECT d.groupid, COUNT(p.id) AS count'
+                . " FROM {$CFG->prefix}forum_posts p"
+                . " JOIN {$CFG->prefix}forum_discussions d ON p.discussion = d.id "
+                . " LEFT JOIN {$CFG->prefix}forum_read r ON r.postid = p.id AND r.userid = $USER->id"
+                . " WHERE d.forum = $cm->instance AND d.groupid IN ($groupids)"
+                . " AND d.timemodified >= $cutoffdate AND p.modified >= $cutoffdate AND r.id is NULL"
+                . " GROUP BY d.groupid";
+            $unread = get_records_sql($sql);
+        }
+    }
+
     if ($allowedgroups) {
         foreach ($allowedgroups as $group) {
             $groupsmenu[$group->id] = format_string($group->name);
+            if (isset($unread[$group->id])) {
+                $unreadstr = get_string('unreadpostsnumber', 'forum',
+                                        $unread[$group->id]->count);
+                $groupsmenu[$group->id] .= " -- $unreadstr";
+            }
         }
     }
 
