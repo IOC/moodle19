@@ -3369,6 +3369,8 @@ function style_sheet_setup($lastmodified=0, $lifetime=300, $themename='', $force
     }
 
     if ($files) {
+        ob_start();
+
     /// Produce a list of all the files first
         echo '/**************************************'."\n";
         echo ' * THEME NAME: '.$themename."\n *\n";
@@ -3411,6 +3413,20 @@ function style_sheet_setup($lastmodified=0, $lifetime=300, $themename='', $force
                 }
             }
         }
+
+        $css = ob_get_clean();
+
+        // CSS minify
+        $css = str_replace("\r\n", "\n", trim($css));
+        $search = array("/\/\*[\d\D]*?\*\/|\t+/", "/\s+/", "/\}\s+/");
+        $replace = array(null, " ", "}\n");
+        $css = preg_replace($search, $replace, $css);
+        $search = array("/\\;\s/", "/\s+\{\\s+/", "/\\:\s+\\#/", "/,\s+/i", "/\\:\s+\\\'/i", "/\\:\s+([0-9]+|[A-F]+)/i");
+        $replace = array(";", "{", ":#", ",", ":\'", ":$1");
+        $css = preg_replace($search, $replace, $css);
+        $css = str_replace("\n", null, $css);
+
+        echo $css;
     }
 
     return $CFG->themewww.'/'.$themename;   // Only to help old themes (1.4 and earlier)
