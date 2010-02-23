@@ -1192,8 +1192,12 @@ function calendar_session_vars($course=null) {
 }
 
 function calendar_overlib_html() {
+    global $CFG;
+    ob_start();
+    include($CFG->dirroot . '/calendar/overlib.cfg.php');
+    $javascript = ob_get_clean();
     return '<div id="overDiv" style="position: absolute; visibility: hidden; z-index:1000;"></div>'
-          .'<script type="text/javascript" src="'.CALENDAR_URL.'overlib.cfg.php"></script>';
+        . "<script type=\"text/javascript\">//<![CDATA[\n{$javascript}\n//]]></script>";
 }
 
 function calendar_set_referring_course($courseid) {
