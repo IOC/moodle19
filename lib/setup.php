@@ -651,6 +651,10 @@ global $HTTPSPAGEREQUIRED;
         $CFG->theme = 'standardwhite';
     }
 
+    if (!empty($_COOKIE['MoodleStandardTheme'])) {
+        $CFG->theme = 'standard';
+    }
+
 /// now do a session test to prevent random user switching - observed on some PHP/Apache combinations,
 /// disable checks when working in cookieless mode
     if (empty($CFG->usesid) || !empty($_COOKIE['MoodleSession'.$CFG->sessioncookie])) {
