@@ -705,6 +705,12 @@ class grade_report_grader extends grade_report {
         $scales_list = '';
         $tabindices = array();
 
+        $showquickfeedback = $this->get_pref('showquickfeedback');
+
+        $cache_decimalpoints = array();
+        $cache_gradetitle_itemname = array();
+        $cache_displaytype = array();
+
         foreach ($this->gtree->items as $item) {
             if (!empty($item->scaleid)) {
                 $scales_list .= "$item->scaleid,";
@@ -713,6 +719,10 @@ class grade_report_grader extends grade_report {
             $tabindices[$item->id]['grade'] = $gradetabindex;
             $tabindices[$item->id]['feedback'] = $gradetabindex + $numusers;
             $gradetabindex += $numusers * 2;
+
+            $cache_decimalpoints[$item->id] = $item->get_decimals();
+            $cache_itemname[$item->id] = $item->get_name(true);
+            $cache_displaytype[$item->id] = $item->get_displaytype();
         }
         $scales_array = array();
 
@@ -724,6 +734,8 @@ class grade_report_grader extends grade_report {
         $row_classes = array(' even ', ' odd ');
 
         foreach ($this->users as $userid => $user) {
+
+            $fullname = fullname($user, $canviewfullname);
 
             if ($this->canviewhidden) {
                 $altered = array();
@@ -749,7 +761,7 @@ class grade_report_grader extends grade_report {
                 $userreportcell = '';
                 $userreportcellcolspan = '';
                 if ($this->canviewuserreport) {
-                    $a->user = fullname($user, $canviewfullname);
+                    $a->user = $fullname;
                     $strgradesforuser = get_string('gradesforuser', 'grades', $a);
                     $userreportcell = '<th class="header userreport"><a href="'.$CFG->wwwroot.'/grade/report/'.$CFG->grade_profilereport.'/index.php?id='.$this->courseid.'&amp;userid='.$user->id.'">'
                                     .'<img src="'.$CFG->pixpath.'/t/grades.gif" alt="'.$strgradesforuser.'" title="'.$strgradesforuser.'" /></a></th>';
@@ -760,7 +772,7 @@ class grade_report_grader extends grade_report {
                 $studentshtml .= '<tr class="r'.$this->rowcount++ . $row_classes[$this->rowcount % 2] . '">'
                               .'<th class="c'.$columncount++.' user" scope="row" onclick="set_row(this.parentNode.rowIndex);" '.$userreportcellcolspan.' >'.$user_pic
                               .'<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$this->course->id.'">'
-                              .fullname($user, $canviewfullname)."</a></th>$userreportcell\n";
+                              .$fullname."</a></th>$userreportcell\n";
 
                 if ($showuseridnumber) {
                     $studentshtml .= '<th class="c'.$columncount++.' useridnumber" onclick="set_row(this.parentNode.rowIndex);">'.
@@ -774,7 +786,7 @@ class grade_report_grader extends grade_report {
                 $grade = $this->grades[$userid][$item->id];
 
                 // Get the decimal points preference for this item
-                $decimalpoints = $item->get_decimals();
+                $decimalpoints = $cache_decimalpoints[$itemid];
 
                 if (in_array($itemid, $unknown)) {
                     $gradeval = null;
@@ -815,8 +827,8 @@ class grade_report_grader extends grade_report {
                     // $cellclasses .= ' excluded';
                 }
 
-                $grade_title = '<div class="fullname">'.fullname($user).'</div>';
-                $grade_title .= '<div class="itemname">'.$item->get_name(true).'</div>';
+                $grade_title = '<div class="fullname">'.$fullname.'</div>';
+                $grade_title .= '<div class="itemname">'.$cache_itemname[$itemid].'</div>';
 
                 if (!empty($grade->feedback) && !$USER->gradeediting[$this->courseid]) {
                     $grade_title .= '<div class="feedback">'
@@ -911,7 +923,7 @@ class grade_report_grader extends grade_report {
 
 
                     // If quickfeedback is on, print an input element
-                    if ($this->get_pref('showquickfeedback') and $grade->is_editable()) {
+                    if ($showquickfeedback and $grade->is_editable()) {
 
                         $studentshtml .= '<input type="hidden" name="oldfeedback_'
                                       .$userid.'_'.$item->id.'" value="' . s($grade->feedback) . '" />';
@@ -921,7 +933,7 @@ class grade_report_grader extends grade_report {
                     }
 
                 } else { // Not editing
-                    $gradedisplaytype = $item->get_displaytype();
+                    $gradedisplaytype = $cache_displaytype[$itemid];
 
                     // If feedback present, surround grade with feedback tooltip: Open span here
 

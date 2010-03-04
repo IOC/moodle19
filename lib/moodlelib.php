@@ -7186,7 +7186,11 @@ function format_float($float, $decimalpoints=1, $localized=true) {
         return '';
     }
     if ($localized) {
-        return number_format($float, $decimalpoints, get_string('decsep'), '');
+        static $decsep = null;
+        if (is_null($decsep)) {
+            $decsep = get_string('decsep');
+        }
+        return number_format($float, $decimalpoints, $decsep, '');
     } else {
         return number_format($float, $decimalpoints, '.', '');
     }
