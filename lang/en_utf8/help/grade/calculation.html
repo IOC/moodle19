@@ -4,14 +4,35 @@ in your language. Please use whichever is used in your spreadsheet application. 
 
 <p>Calculations for the gradebook follow the pattern of formulas/functions in popular
 spreadsheet programs. They start with an equal (=) sign, and use common mathematical
-operators and functions to produce a single numerical output. This output is then
+and logical operators and functions to produce a single numerical output. This output is then
 used as the computed value for the grade item you are editing.</p>
+
+<p>Following is a list of the supported operators:<p>
+<ul>
+  <li>number1 <strong>if</strong> boolean <strong>else</strong> number2</li>
+  <li>boolean1 <strong>or</strong> boolean2</li>
+  <li>boolean1 <strong>and</strong> boolean2</li>
+  <li><strong>not</strong> boolean</li>
+  <li>number1 <strong>=</strong> number2</li>
+  <li>number1 <strong>!=</strong> number2</li>
+  <li>number1 <strong>&lt;</strong> number2</li>
+  <li>number1 <strong>&gt;</strong> number2</li>
+  <li>number1 <strong>&lt;=</strong> number2</li>
+  <li>number1 <strong>&gt;=</strong> number2</li>
+  <li>number1 <strong>+</strong> number1</li>
+  <li>number1 <strong>-</strong> number1</li>
+  <li>number1 <strong>*</strong> number1</li>
+  <li>number1 <strong>/</strong> number1</li>
+  <li><strong>-</strong> number</li>
+  <li>number1 <strong>^</strong> number2</li>
+</ul>
 
 <p>Following is a list of the functions supported by the calculation. The comma (,)
 character is used to separate arguments within function brackets.</p>
 
 <ul>
     <li><strong>average</strong>([[item1]], [[item2]]...): Returns the average of a sample</li>
+    <li><strong>count</strong>(boolean1, boolean2...): Returns the number of boolean expressions that evaluate to true</li>
     <li><strong>max</strong>([[item1]], [[item2]]...): Returns the maximum value in a list of arguments</li>
     <li><strong>min</strong>([[item1]], [[item2]]...): Returns the minimum value in a list of arguments</li>
     <li><strong>mod</strong>(dividend, divisor): Calculates the remainder of a division</li>
@@ -53,4 +74,6 @@ assigned. You are then free to use these references in your calculation.</p>
 <ul>
     <li>=average([[Quiz.1]], [[Quiz.4]], [[Assignment.1]])</li>
     <li>=average(max([[Quiz.1]], [[Quiz.4]], [[Assignment.1]]), min([[Quiz.1]], [[Quiz.4]], [[Assignment.1]]))</li>
+    <li>=[[Assignment.1]] + (1 if [[Quiz.1]] >= 5 and [[Quiz.2]] >= 5 else 0)</li>
+    <li>=count([[Quiz.1]] >= 5, [[Quiz.2]] >= 5, [[Quiz.3]] >= 5, [[Quiz.4]] >= 5) * 2.5</li>
 </ul>
