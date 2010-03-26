@@ -1679,7 +1679,8 @@ class grade_item extends grade_object {
             // missing item
             return false;
         }
-        $this->formula = new calc_formula($formula);
+        require_once("{$CFG->dirroot}/local/formula/moodle.php");
+        $this->formula = new calc_formula_local($formula);
 
         // where to look for final grades?
         // this itemid is added so that we use only one query for source and final grades
@@ -1841,7 +1842,8 @@ class grade_item extends grade_object {
 
         // prepare formula and init maths library
         $formula = preg_replace('/##(gi\d+)##/', '\1', $formulastr);
-        $formula = new calc_formula($formula);
+        require_once("{$CFG->dirroot}/local/formula/moodle.php");
+        $formula = new calc_formula_local($formula);
 
 
         if (empty($useditems)) {
