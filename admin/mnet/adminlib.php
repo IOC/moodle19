@@ -138,7 +138,7 @@ function upgrade_RPC_functions($returnurl) {
             if ($firstchar == '.' or $dir == 'CVS' or $dir == '_vti_cnf') {
                 continue;
             }
-            if (filetype($basedir .'/'. $dir) != 'dir') {
+            if (!is_dir($basedir .'/'. $dir)) {
                 continue;
             }
 
@@ -155,7 +155,7 @@ function upgrade_RPC_functions($returnurl) {
             if ($firstchar == '.' or $dir == 'CVS' or $dir == '_vti_cnf') {
                 continue;
             }
-            if (filetype($basedir .'/'. $dir) != 'dir') {
+            if (!is_dir($basedir .'/'. $dir)) {
                 continue;
             }
 
@@ -171,7 +171,7 @@ function upgrade_RPC_functions($returnurl) {
             if ($firstchar == '.' or $dir == 'CVS' or $dir == '_vti_cnf') {
                 continue;
             }
-            if (filetype($basedir .'/'. $dir) != 'dir') {
+            if (!is_dir($basedir .'/'. $dir)) {
                 continue;
             }
 
