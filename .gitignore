@@ -9,7 +9,6 @@
 #
 # See gitignore(5) man page for more details
 #
-/config.php
 /lib/editor/tinymce/extra/tools/temp/
 *~
 *.swp
@@ -25,3 +24,4 @@ CVS
 /.project
 /.buildpath
 /.cache
+/etags.sh
