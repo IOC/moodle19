@@ -98,6 +98,8 @@
 /// increase memory limit (PHP 5.2 does different calculation, we need more memory now)
     @raise_memory_limit('128M');
 
+    local_raise_resource_limits();
+
 /// Start output log
 
     $timenow  = time();
