@@ -15,6 +15,8 @@ function scorm_add_instance($scorm) {
 
     require_once($CFG->dirroot.'/mod/scorm/locallib.php');
 
+    local_raise_resource_limits();
+
     if (($packagedata = scorm_check_package($scorm)) != null) {
         $scorm->pkgtype = $packagedata->pkgtype;
         $scorm->datadir = $packagedata->datadir;
@@ -80,6 +82,8 @@ function scorm_update_instance($scorm) {
     global $CFG;
 
     require_once($CFG->dirroot.'/mod/scorm/locallib.php');
+
+    local_raise_resource_limits();
 
     $scorm->parse = 0;
     if (($packagedata = scorm_check_package($scorm)) != null) {
