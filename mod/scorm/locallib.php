@@ -832,6 +832,8 @@ function scorm_validate_aicc($packagedir) {
 function scorm_validate($data) {
     global $CFG;
 
+    local_raise_resource_limits();
+
     $validation = new stdClass();
     $validation->errors = array();
 
