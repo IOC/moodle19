@@ -146,6 +146,8 @@
         raise_memory_limit($CFG->extramemorylimit);
     }
 
+    local_raise_resource_limits();
+
     //Call the form, depending the step we are
 
     if (!$launch) {

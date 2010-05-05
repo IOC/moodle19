@@ -122,6 +122,8 @@
     @ini_set("max_execution_time","3000");
     raise_memory_limit("192M");
 
+    local_raise_resource_limits();
+
     //Call the form, depending the step we are
     if (!$launch or !data_submitted() or !confirm_sesskey()) {
         // if we're at the start, clear the cache of prefs
