@@ -3866,6 +3866,8 @@ function reset_course_userdata($data) {
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->dirroot.'/group/lib.php');
 
+    local_raise_resource_limits();
+
     $data->courseid = $data->id;
     $context = get_context_instance(CONTEXT_COURSE, $data->courseid);
 
