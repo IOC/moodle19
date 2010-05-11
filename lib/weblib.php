@@ -268,14 +268,6 @@ function qualified_me() {
 
     if (!empty($url['host'])) {
         $hostname = $url['host'];
-    } else if (!empty($_SERVER['SERVER_NAME'])) {
-        $hostname = $_SERVER['SERVER_NAME'];
-    } else if (!empty($_ENV['SERVER_NAME'])) {
-        $hostname = $_ENV['SERVER_NAME'];
-    } else if (!empty($_SERVER['HTTP_HOST'])) {
-        $hostname = $_SERVER['HTTP_HOST'];
-    } else if (!empty($_ENV['HTTP_HOST'])) {
-        $hostname = $_ENV['HTTP_HOST'];
     } else {
         notify('Warning: could not find the name of this server!');
         return false;
@@ -283,10 +275,6 @@ function qualified_me() {
 
     if (!empty($url['port'])) {
         $hostname .= ':'.$url['port'];
-    } else if (!empty($_SERVER['SERVER_PORT'])) {
-        if ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) {
-            $hostname .= ':'.$_SERVER['SERVER_PORT'];
-        }
     }
 
     // TODO, this does not work in the situation described in MDL-11061, but
