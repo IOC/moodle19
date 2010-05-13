@@ -3780,7 +3780,6 @@ function remove_course_contents($courseid, $showfeedback=true) {
 
     $tablestoclear = array(
         'event' => 'courseid', // Delete events
-        'log' => 'course', // Delete logs
         'course_sections' => 'course', // Delete any course stuff
         'course_modules' => 'course',
         'backup_courses' => 'courseid', // Delete scheduled backup stuff
