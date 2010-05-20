@@ -5,7 +5,7 @@
 
     $nomoodlecookie = true;
 
-    include('../config.php');
+    require_once('../config.php');
 
     $output = "// Javascript from Moodle modules\n";
 
