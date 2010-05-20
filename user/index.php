@@ -62,7 +62,7 @@
         // We should further exclude "admin" users (those with "doanything" at site level) because
         // Otherwise they appear in every participant list
 
-        $canviewroles    = get_roles_with_capability('moodle/course:view', CAP_ALLOW, $context);
+        $canviewroles    = get_roles_with_capability('moodle/local:enrolled', CAP_ALLOW, $context);
         $doanythingroles = get_roles_with_capability('moodle/site:doanything', CAP_ALLOW, $sitecontext);
 
         if ($context->id == $frontpagectx->id) {
