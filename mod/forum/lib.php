@@ -383,7 +383,7 @@ function forum_cron() {
 
                 // Verify user is enrollend in course - if not do not send any email
                 if (!isset($userto->enrolledin[$course->id])) {
-                    $userto->enrolledin[$course->id] = has_capability('moodle/course:view', get_context_instance(CONTEXT_COURSE, $course->id));
+                    $userto->enrolledin[$course->id] = has_capability('moodle/local:enrolled', get_context_instance(CONTEXT_COURSE, $course->id));
                 }
                 if (!$userto->enrolledin[$course->id]) {
                     // oops - this user should not receive anything from this course
