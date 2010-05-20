@@ -805,7 +805,7 @@ function get_courses_wmanagers($categoryid=0, $sort="c.sortorder ASC", $fields=a
  * @param int $limit Maximum number of records to return, or 0 for unlimited
  * @return array {@link $COURSE} of course objects
  */
-function get_my_courses($userid, $sort='visible DESC,sortorder ASC', $fields=NULL, $doanything=false,$limit=0) {
+function get_my_courses($userid, $sort='visible DESC,sortorder ASC', $fields=NULL, $doanything=false,$limit=0,$enrolled_only=true) {
 
     global $CFG,$USER;
 
@@ -875,7 +875,7 @@ function get_my_courses($userid, $sort='visible DESC,sortorder ASC', $fields=NUL
             // list _only_ this course
             // anything else is asking for trouble...
             $courseids = $USER->loginascontext->instanceid;
-        } elseif (isset($USER->mycourses)
+        } elseif ($enrolled_only and isset($USER->mycourses)
                   && is_string($USER->mycourses)) {
             if ($USER->mycourses === '') {
                 // empty str means: user has no courses
@@ -883,6 +883,13 @@ function get_my_courses($userid, $sort='visible DESC,sortorder ASC', $fields=NUL
                 return array();
             } else {
                 $courseids = $USER->mycourses;
+            }
+        } elseif (!$enrolled_only && isset($USER->myviewcourses)
+                  && is_string($USER->myviewcourses)) {
+            if ($USER->myviewcourses === '') {
+                return array();
+            } else {
+                $courseids = $USER->myviewcourses;
             }
         }
         if (isset($courseids)) {
@@ -929,7 +936,8 @@ function get_my_courses($userid, $sort='visible DESC,sortorder ASC', $fields=NUL
     }
 
 
-    $courses = get_user_courses_bycap($userid, 'moodle/course:view', $accessinfo,
+    $cap = $enrolled_only ? 'moodle/local:enrolled' : 'moodle/course:view';
+    $courses = get_user_courses_bycap($userid, $cap, $accessinfo,
                                       $doanything, $sort, $fields,
                                       $limit);
 
@@ -1054,7 +1062,11 @@ function get_my_courses($userid, $sort='visible DESC,sortorder ASC', $fields=NUL
         // - for the logged in user
         // - below the threshold (500)
         // empty string is _valid_
-        $USER->mycourses = join(',',$cacheids);
+        if ($enrolled_only) {
+            $USER->mycourses = join(',',$cacheids);
+        } else {
+            $USER->myviewcourses = join(',',$cacheids);
+        }
     } elseif ($userid === $USER->id && isset($USER->mycourses)) {
         // cheap sanity check
         unset($USER->mycourses);
