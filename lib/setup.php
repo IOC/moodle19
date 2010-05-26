@@ -77,6 +77,9 @@ global $THEME;
 */
 global $HTTPSPAGEREQUIRED;
 
+/// Local profiling
+    require_once($CFG->dirroot . '/local/profiling/lib.php');
+    local_profiling::init();
 
 /// First try to detect some attacks on older buggy PHP versions
     if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']) || isset($_FILES['GLOBALS'])) {
