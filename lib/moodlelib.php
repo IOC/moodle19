@@ -6506,6 +6506,8 @@ function check_php_version($version='4.1.0') {
               return false;
           } elseif (strpos($agent, 'SymbianOS')) { // Reject SymbianOS
               return false;
+          } elseif (strpos($agent, 'Android')) { // Reject Androids too
+              return false;
           }
           if (strpos($agent, 'iPhone') or strpos($agent, 'iPad') or strpos($agent, 'iPod')) {
               // No Apple mobile devices here - editor does not work, course ajax is not touch compatible, etc.
@@ -6601,12 +6603,16 @@ function can_use_html_editor() {
     global $USER, $CFG;
 
     if (!empty($USER->htmleditor) and !empty($CFG->htmleditor)) {
-        if (check_browser_version('MSIE', 5.5)) {
+        if (check_browser_version('MSIE', 7)) {
             return 'MSIE';
         } else if (check_browser_version('Gecko', 20030516)) {
             return 'Gecko';
         } else if (check_browser_version('Safari', 531)) {
             return 'AppleWebKit';
+        } else if (check_browser_version('Chrome', 6)) {
+            return true;
+        } else if (check_browser_version('Opera', 9)) {
+            return true;
         }
     }
     return false;
