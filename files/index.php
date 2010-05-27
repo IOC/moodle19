@@ -102,7 +102,15 @@
             <script type="text/javascript">
             //<![CDATA[
             function set_value(txt) {
-                opener.document.forms['<?php echo $chooseparts[0]; ?>'].<?php echo $chooseparts[1]; ?>.value = txt;
+                if (typeof(opener.tinymce3_window) !== 'undefined') {
+                    if (!txt.match(/^[a-z]+:\/\//)) {
+                        txt = '<?php echo get_file_url($course->id.'/'); ?>/' + txt;
+                    }
+                    opener.tinymce3_window.document.forms['<?php echo $chooseparts[0]; ?>'].<?php echo $chooseparts[1]; ?>.value = txt;
+                    opener.tinymce3_window.document.forms['<?php echo $chooseparts[0]; ?>'].<?php echo $chooseparts[1]; ?>.onchange();
+                } else {
+                    opener.document.forms['<?php echo $chooseparts[0]; ?>'].<?php echo $chooseparts[1]; ?>.value = txt;
+                }
                 window.close();
             }
             //]]>
@@ -114,7 +122,15 @@
             <script type="text/javascript">
             //<![CDATA[
             function set_value(txt) {
-                opener.document.getElementById('<?php echo $chooseparts[0] ?>').value = txt;
+                if (typeof(opener.tinymce3_window) !== 'undefined') {
+                    if (!txt.match(/^[a-z]+:\/\//)) {
+                        txt = '<?php echo get_file_url($course->id.'/'); ?>/' + txt;
+                    }
+                    opener.tinymce3_window.document.getElementById('<?php echo $chooseparts[0] ?>').value = txt;
+                    opener.tinymce3_window.document.getElementById('<?php echo $chooseparts[0] ?>').onchange();
+                } else {
+                    opener.document.getElementById('<?php echo $chooseparts[0] ?>').value = txt;
+                }
                 window.close();
             }
             //]]>
@@ -667,6 +683,22 @@
                 displaydir($wdir);
             }
             html_footer();
+            break;
+
+        case "uploadnanogong":
+            if (confirm_sesskey()) {
+                if (isset($_FILES['newfile'])) {
+                    $_FILES['newfile']['name'] = $file;
+                }
+                require_once($CFG->dirroot.'/lib/uploadlib.php');
+                $course->maxbytes = 0;  // We are ignoring course limits
+                $um = new upload_manager('newfile',false,false,$course,false,0);
+                $dir = "$basedir$wdir";
+                if ($um->process_file_uploads($dir)) {
+                    echo 'success';
+                }
+            }
+            die;
             break;
 
         case "cancel":
