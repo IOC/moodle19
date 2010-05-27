@@ -104,6 +104,7 @@ $ALLOWED_PROTOCOLS = array('http', 'https', 'ftp', 'news', 'mailto', 'rtsp', 'te
                            'color', 'callto', 'cursor', 'text-align', 'font-size', 'font-weight', 'font-style', 'font-family',
                            'border', 'border-bottom', 'border-left', 'border-top', 'border-right', 'margin', 'margin-bottom', 'margin-left', 'margin-top', 'margin-right',
                            'padding', 'padding-bottom', 'padding-left', 'padding-top', 'padding-right', 'vertical-align',
+                           'width', 'height', 'float', // TinyMCE
                            'background', 'background-color', 'text-decoration');   // CSS as well to get through kses
 
 
@@ -5031,7 +5032,7 @@ function print_textarea($usehtmleditor, $rows, $cols, $width, $height, $name, $v
     $str = '';
 
     if ($id === '') {
-        $id = 'edit-'.$name;
+        $id = 'edit_'.md5($name);
     }
 
     if ( empty($CFG->editorsrc) ) { // for backward compatibility.
@@ -5040,19 +5041,17 @@ function print_textarea($usehtmleditor, $rows, $cols, $width, $height, $name, $v
         }
 
         if ($usehtmleditor) {
-            if (!empty($courseid) and has_capability('moodle/course:managefiles', get_context_instance(CONTEXT_COURSE, $courseid))) {
-                $httpsrequired = empty($HTTPSPAGEREQUIRED) ? '' : '&amp;httpsrequired=1';
-                // needed for course file area browsing in image insert plugin
-                $str .= ($scriptcount < 1) ? '<script type="text/javascript" src="'.
-                        $CFG->httpswwwroot .'/lib/editor/htmlarea/htmlarea.php?id='.$courseid.$httpsrequired.'"></script>'."\n" : '';
-            } else {
-                $httpsrequired = empty($HTTPSPAGEREQUIRED) ? '' : '?httpsrequired=1';
-                $str .= ($scriptcount < 1) ? '<script type="text/javascript" src="'.
-                         $CFG->httpswwwroot .'/lib/editor/htmlarea/htmlarea.php'.$httpsrequired.'"></script>'."\n" : '';
-
+            if ($scriptcount == 0) {
+                $str .= '<script type="text/javascript" src="'. $CFG->httpswwwroot
+                    . '/local/lib/tiny_mce/tiny_mce.js"></script>';
+                $str .= "\n".'<script type="text/javascript">'."\n";
+                $str .= '//<![CDATA['."\n\n"; // Extra \n is to fix odd wiki problem, MDL-8185
+                ob_start();
+                include("{$CFG->dirroot}/local/tinymce-js.php");
+                $str .= ob_get_clean();
+                $str .= '//]]>'."\n";
+                $str .= '</script>'."\n";
             }
-            $str .= ($scriptcount < 1) ? '<script type="text/javascript" src="'.
-                    $CFG->httpswwwroot .'/lib/editor/htmlarea/lang/en.php?id='.$courseid.'"></script>'."\n" : '';
             $scriptcount++;
 
             if ($height) {    // Usually with legacy calls
@@ -5075,15 +5074,6 @@ function print_textarea($usehtmleditor, $rows, $cols, $width, $height, $name, $v
     }
     $str .= '</textarea>'."\n";
 
-    if ($usehtmleditor) {
-        // Show shortcuts button if HTML editor is in use, but only if JavaScript is enabled (MDL-9556)
-        $str .= '<script type="text/javascript">
-//<![CDATA[
-document.write(\''.addslashes_js(editorshortcutshelpbutton()).'\');
-//]]>
-</script>';
-    }
-
     if ($return) {
         return $str;
     }
@@ -5102,31 +5092,20 @@ document.write(\''.addslashes_js(editorshortcutshelpbutton()).'\');
  */
 function use_html_editor($name='', $editorhidebuttons='', $id='') {
     global $THEME;
+    global $CFG, $COURSE;
 
     $editor = 'editor_'.md5($name); //name might contain illegal characters
     if ($id === '') {
-        $id = 'edit-'.$name;
+        $id = 'edit_'.md5($name);
     }
-    echo "\n".'<script type="text/javascript" defer="defer">'."\n";
+    echo "\n".'<script type="text/javascript">'."\n";
     echo '//<![CDATA['."\n\n"; // Extra \n is to fix odd wiki problem, MDL-8185
-    echo "$editor = new HTMLArea('$id');\n";
-    echo "var config = $editor.config;\n";
-
-    echo print_editor_config($editorhidebuttons);
-
-    if (empty($THEME->htmleditorpostprocess)) {
-        if (empty($name)) {
-            echo "\nHTMLArea.replaceAll($editor.config);\n";
-        } else {
-            echo "\n$editor.generate();\n";
-        }
+    if ($name) {
+        echo "tinyMCE.execCommand('mceAddControl', true, '$id');\n";
     } else {
-        if (empty($name)) {
-            echo "\nvar HTML_name = '';";
-        } else {
-            echo "\nvar HTML_name = \"$name;\"";
-        }
-        echo "\nvar HTML_editor = $editor;";
+        echo "var editors = document.getElementsByTagName('textarea');"
+            . " for (var i = 0; i < editors.length; i++) "
+            . " tinyMCE.execCommand('mceAddControl', true, editors[i].id);\n";
     }
     echo '//]]>'."\n";
     echo '</script>'."\n";

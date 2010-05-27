@@ -1403,6 +1403,9 @@ function validate_' . $this->_formName . '(frm) {
   if (skipClientValidation) {
      return true;
   }
+  if (typeof(tinyMCE) !== \'undefined\') {
+    tinyMCE.triggerSave();
+  }
   var ret = true;
 
   var frm = document.getElementById(\''. $this->_attributes['id'] .'\')
