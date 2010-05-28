@@ -886,7 +886,7 @@ function grade_force_site_regrading() {
  * @param object $updated_item the item in which
  * @return boolean true if ok, array of errors if problems found (item id is used as key)
  */
-function grade_regrade_final_grades($courseid, $userid=null, $updated_item=null) {
+function grade_regrade_final_grades($courseid, $userid=null, $updated_item=null, $forceregrade=false) {
 
     $course_item = grade_item::fetch_course_item($courseid);
 
@@ -905,6 +905,11 @@ function grade_regrade_final_grades($courseid, $userid=null, $updated_item=null)
             // nothing to do :-)
             return true;
         }
+    }
+
+    $local = local_course_record($courseid);
+    if ($local->gradeserror and !$forceregrade) {
+        return array($course_item->id => "Grades have errors, regrading pending");
     }
 
     $grade_items = grade_item::fetch_all(array('courseid'=>$courseid));
@@ -965,6 +970,9 @@ function grade_regrade_final_grades($courseid, $userid=null, $updated_item=null)
                 }
             }
         }
+
+        set_field('local_course', 'gradeserror', count($errors) ? '1' : '0',
+                  'course', $courseid);
 
         if ($count == 0) {
             $failed++;
