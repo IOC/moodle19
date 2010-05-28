@@ -753,6 +753,30 @@ function print_grade_page_head($courseid, $active_type, $active_plugin=null, $he
     $returnval = print_header_simple($strgrades . ': ' . $stractive_type, $title, $navigation, '',
             $bodytags, true, $buttons, navmenu($COURSE), false, '', $return);
 
+    $course_item = grade_item::fetch_course_item($courseid);
+    $context = get_context_instance(CONTEXT_COURSE, $courseid);
+    if ($course_item->needsupdate and has_capability('moodle/grade:edit', $context)) {
+        $options = array('id' => $courseid, 'sesskey' => sesskey(),
+                         'report' => 'grader', 'regrade' => 1);
+        $msg = '<div style="width: 50%; margin: 1em auto;'
+            . ' padding: 0.5em 1em 0 1em; border: 3px solid red;">'
+            . '<h2 style="text-align: center;">ATENCIÓ</h2>'
+            . '<p>En aquests moments les qualificacions d\'aquest curs no'
+            . ' s\'actualitzen automàticament perquè hi ha errors als'
+            . ' elements de qualificació. Corregiu les errades i feu'
+            . ' clic a "Actualitza les qualificacions" perquè tornin'
+            . ' a funcionar correctament.</p>'
+            . print_single_button($CFG->wwwroot . '/grade/report/grader/index.php',
+                                  $options, 'Actualitza les qualificacions',
+                                  'post','_self', true)
+            . '</div>';
+        if ($return) {
+            $returnval .= $msg;
+        } else {
+            echo $msg;
+        }
+    }
+
     // Guess heading if not given explicitly
     if (!$heading) {
         $heading = $stractive_plugin;
