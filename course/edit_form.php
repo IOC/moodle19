@@ -419,6 +419,8 @@ class course_edit_form extends moodleform {
             }
         }
 
+        local_course_edit_form($course ? $course->id : false, $mform);
+
 //--------------------------------------------------------------------------------
         $this->add_action_buttons();
 //--------------------------------------------------------------------------------
