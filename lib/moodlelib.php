@@ -3633,6 +3633,8 @@ function delete_course($courseorid, $showfeedback = true) {
     if ($result) {
         //trigger events
         events_trigger('course_deleted', $course);
+
+        local_course_delete($courseid);
     }
 
     return $result;
