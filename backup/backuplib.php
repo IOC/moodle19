@@ -713,6 +713,7 @@
             fwrite ($bf,full_tag("ENROLSTARTDATE",3,false,$course->enrolstartdate));
             fwrite ($bf,full_tag("ENROLENDDATE",3,false,$course->enrolenddate));
             fwrite ($bf,full_tag("ENROLPERIOD",3,false,$course->enrolperiod));
+            fwrite ($bf,full_tag("LOCAL",3,false,local_course_backup($course->id)));
 
             /// write local course overrides here?
             write_role_overrides_xml($bf, $context, 3);

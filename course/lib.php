@@ -3327,6 +3327,8 @@ function create_course($data) {
         // Trigger events
         events_trigger('course_created', $course);
 
+        local_course_create($course->id, $data);
+
         return $course;
     }
 
@@ -3404,6 +3406,8 @@ function update_course($data) {
 
         // Trigger events
         events_trigger('course_updated', $course);
+
+        local_course_update($course->id, $data);
 
         return true;
 

@@ -1208,6 +1208,9 @@ define('RESTORE_GROUPS_GROUPINGS', 3);
             //Now insert the record
             $newid = insert_record("course",$course);
             if ($newid) {
+                if (isset($course_header->course_local)) {
+                    local_course_restore($newid, $course_header->course_local);
+                }
                 //save old and new course id
                 backup_putid ($restore->backup_unique_code,"course",$course_header->course_id,$newid);
                 //Replace old course_id in course_header
@@ -5899,6 +5902,9 @@ define('RESTORE_GROUPS_GROUPINGS', 3);
                             break;
                         case "ENROLPERIOD":
                             $this->info->course_enrolperiod = $this->getContents();
+                            break;
+                        case "LOCAL":
+                            $this->info->course_local = $this->getContents();
                             break;
                     }
                 }
