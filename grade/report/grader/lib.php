@@ -175,6 +175,9 @@ class grade_report_grader extends grade_report {
                 $data_type = 'grade';
             } else if (strpos($varname, 'feedback') === 0) {
                 $data_type = 'feedback';
+            } else if ($varname == 'regrade') {
+                grade_regrade_final_grades($this->course->id, null, null, true);
+                redirect('index.php?id=' . $this->course->id);
             } else {
                 continue;
             }
