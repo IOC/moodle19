@@ -225,6 +225,8 @@ httpsrequired();
 
             reset_login_count();
 
+            local_login($user->id, $frm->password, $urltogo);
+
             redirect($urltogo);
 
             exit;
