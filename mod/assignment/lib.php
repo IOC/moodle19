@@ -822,7 +822,7 @@ class assignment_base {
         } else {
             $gradebookroles = '';
         }
-        $users = get_role_users($gradebookroles, $context, true, '', 'u.lastname ASC', true, $currentgroup);
+        $users = get_users_by_capability($context, 'mod/assignment:submit', 'u.id', '', '', '', $currentgroup, '', false);
         if ($users) {
             $users = array_keys($users);
             // if groupmembersonly used, remove users who are not in any group
@@ -1084,7 +1084,7 @@ class assignment_base {
         } else {
             $gradebookroles = '';
         }
-        $users = get_role_users($gradebookroles, $context, true, '', 'u.lastname ASC', true, $currentgroup);
+        $users = get_users_by_capability($context, 'mod/assignment:submit', 'u.id', '', '', '', $currentgroup, '', false);
         if ($users) {
             $users = array_keys($users);
             if (!empty($CFG->enablegroupings) and $cm->groupmembersonly) {
@@ -2797,7 +2797,7 @@ function assignment_count_real_submissions($cm, $groupid=0) {
     } else {
         $gradebookroles = '';
     }
-    $users = get_role_users($gradebookroles, $context, true, '', 'u.lastname ASC', true, $groupid);
+    $users = get_users_by_capability($context, 'mod/assignment:submit', 'u.id', '', '', '', $groupid, '', false);
     if ($users) {
         $users = array_keys($users);
         // if groupmembersonly used, remove users who are not in any group
@@ -3031,7 +3031,7 @@ function assignment_print_overview($courses, &$htmlarray) {
             } else {
                 $gradebookroles = '';
             }
-            $students = get_role_users($gradebookroles, $context, true);
+            $students = get_users_by_capability($context, 'mod/assignment:submit', 'u.id', '', '', '', 0, '', false);
             if ($students) {
                 foreach($students as $student){
                     if(isset($unmarkedsubmissions[$assignment->id][$student->id])){
