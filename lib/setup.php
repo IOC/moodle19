@@ -426,7 +426,6 @@ global $HTTPSPAGEREQUIRED;
             if (!file_exists($CFG->dataroot .'/sessions')) {
                 make_upload_directory('sessions');
             }
-            ini_set('session.save_path', $CFG->dataroot .'/sessions');
 
         } else {                         /// Database sessions
             ini_set('session.save_handler', 'user');
