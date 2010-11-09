@@ -383,6 +383,13 @@ class XMLDBmysql extends XMLDBGenerator {
         );
         return $reserved_words;
     }
+
+    function getCreateTableSQL($xmldb_table) {
+        $results = parent::getCreateTableSQL($xmldb_table);
+        $results[0] .= ' ENGINE=InnoDB';
+        return $results;
+    }
+
 }
 
 ?>
