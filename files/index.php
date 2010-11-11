@@ -842,7 +842,7 @@ function displaydir ($wdir) {
                 $filename = $fullpath."/".$dir;
                 $fileurl  = rawurlencode($wdir."/".$dir);
                 $filesafe = rawurlencode($dir);
-                $filesize = display_size(get_directory_size("$fullpath/$dir"));
+                $filesize = '';
                 $filedate = userdate(filemtime($filename), get_string("strftimedatetime"));
                 if ($wdir.$dir === '/moddata') {
                     print_cell();
