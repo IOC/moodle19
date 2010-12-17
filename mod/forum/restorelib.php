@@ -73,7 +73,7 @@
             $forum->assesstimefinish = backup_todb($info['MOD']['#']['ASSESSTIMEFINISH']['0']['#']);
             $forum->maxbytes = backup_todb($info['MOD']['#']['MAXBYTES']['0']['#']);
             $forum->scale = backup_todb($info['MOD']['#']['SCALE']['0']['#']);
-            $forum->forcesubscribe = backup_todb($info['MOD']['#']['FORCESUBSCRIBE']['0']['#']);
+            $forum->forcesubscribe = 3; // FORUM_DISALLOWSUBSCRIBE
             $forum->trackingtype = backup_todb($info['MOD']['#']['TRACKINGTYPE']['0']['#']);
             $forum->rsstype = backup_todb($info['MOD']['#']['RSSTYPE']['0']['#']);
             $forum->rssarticles = backup_todb($info['MOD']['#']['RSSARTICLES']['0']['#']);
