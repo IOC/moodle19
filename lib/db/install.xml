@@ -114,7 +114,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="course_userid" UNIQUE="false" FIELDS="course, userid"/>
+        <INDEX NAME="course_userid" UNIQUE="false" FIELDS="course, userid" NEXT="userid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" PREVIOUS="course_userid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="course_meta" COMMENT="to store meta-courses relations" PREVIOUS="course_display" NEXT="course_modules">
@@ -524,9 +525,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid-courseid" UNIQUE="true" FIELDS="userid, courseid" NEXT="userid"/>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" PREVIOUS="userid-courseid" NEXT="courseid"/>
-        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid" PREVIOUS="userid"/>
+        <INDEX NAME="userid-courseid" UNIQUE="true" FIELDS="userid, courseid" NEXT="courseid-timeaccess"/>
+        <INDEX NAME="courseid-timeaccess" UNIQUE="false" FIELDS="courseid, timeaccess" PREVIOUS="userid-courseid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="scale" COMMENT="Defines grading scales" PREVIOUS="user_lastaccess" NEXT="scale_history">
