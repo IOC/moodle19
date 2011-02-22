@@ -36,7 +36,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" />
       </KEYS>
       <INDEXES>
-        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course" NEXT="scale"/>
+        <INDEX NAME="scale" UNIQUE="false" FIELDS="scale" PREVIOUS="course"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="glossary_entries" COMMENT="all glossary entries" PREVIOUS="glossary" NEXT="glossary_alias">
