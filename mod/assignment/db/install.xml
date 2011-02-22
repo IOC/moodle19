@@ -30,7 +30,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" />
       </KEYS>
       <INDEXES>
-        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course" NEXT="grade"/>
+        <INDEX NAME="grade" UNIQUE="false" FIELDS="grade" PREVIOUS="course"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="assignment_submissions" COMMENT="Info about submitted assignments" PREVIOUS="assignment">

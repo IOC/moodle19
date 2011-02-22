@@ -29,7 +29,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course" NEXT="scale"/>
+        <INDEX NAME="scale" UNIQUE="false" FIELDS="scale" PREVIOUS="course"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="forum_discussions" COMMENT="Forums are composed of discussions" PREVIOUS="forum" NEXT="forum_posts">
@@ -48,11 +49,12 @@
         <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="timestart"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="forum"/>
-        <KEY NAME="forum" TYPE="foreign" FIELDS="forum" REFTABLE="forum" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" NEXT="course"/>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course" PREVIOUS="userid" NEXT="forum-timemodified"/>
+        <INDEX NAME="forum-timemodified" UNIQUE="false" FIELDS="forum, timemodified" PREVIOUS="course"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="forum_posts" COMMENT="All posts are stored in this table" PREVIOUS="forum_discussions" NEXT="forum_queue">
@@ -72,14 +74,14 @@
         <FIELD NAME="mailnow" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="totalscore"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="discussion"/>
-        <KEY NAME="discussion" TYPE="foreign" FIELDS="discussion" REFTABLE="forum_discussions" REFFIELDS="id" PREVIOUS="primary" NEXT="parent"/>
-        <KEY NAME="parent" TYPE="foreign" FIELDS="parent" REFTABLE="forum_posts" REFFIELDS="id" COMMENT="note that to make this recursive FK working someday, the parent field must be decalred NULL" PREVIOUS="discussion"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="parent"/>
+        <KEY NAME="parent" TYPE="foreign" FIELDS="parent" REFTABLE="forum_posts" REFFIELDS="id" COMMENT="note that to make this recursive FK working someday, the parent field must be decalred NULL" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" NEXT="created"/>
         <INDEX NAME="created" UNIQUE="false" FIELDS="created" PREVIOUS="userid" NEXT="mailed"/>
-        <INDEX NAME="mailed" UNIQUE="false" FIELDS="mailed" PREVIOUS="created"/>
+        <INDEX NAME="mailed" UNIQUE="false" FIELDS="mailed" PREVIOUS="created" NEXT="discussion-modified"/>
+        <INDEX NAME="discussion-modified" UNIQUE="false" FIELDS="discussion, modified" PREVIOUS="mailed"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="forum_queue" COMMENT="For keeping track of posts that will be mailed in digest form" PREVIOUS="forum_posts" NEXT="forum_ratings">
@@ -143,9 +145,10 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid-forumid" UNIQUE="false" FIELDS="userid, forumid" NEXT="userid-discussionid"/>
-        <INDEX NAME="userid-discussionid" UNIQUE="false" FIELDS="userid, discussionid" PREVIOUS="userid-forumid" NEXT="userid-postid"/>
-        <INDEX NAME="userid-postid" UNIQUE="false" FIELDS="userid, postid" PREVIOUS="userid-discussionid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" NEXT="forumid-userid"/>
+        <INDEX NAME="forumid-userid" UNIQUE="false" FIELDS="forumid, userid" PREVIOUS="userid" NEXT="discussionid-userid"/>
+        <INDEX NAME="discussionid-userid" UNIQUE="false" FIELDS="discussionid, userid" PREVIOUS="forumid-userid" NEXT="postid-userid"/>
+        <INDEX NAME="postid-userid" UNIQUE="false" FIELDS="postid, userid" PREVIOUS="discussionid-userid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="forum_track_prefs" COMMENT="Tracks each users untracked forums" PREVIOUS="forum_read">
