@@ -19,7 +19,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" />
       </KEYS>
       <INDEXES>
-        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course" NEXT="assessed"/>
+        <INDEX NAME="assessed" UNIQUE="false" FIELDS="assessed" PREVIOUS="course"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="journal_entries" COMMENT="All the journal entries of all people" PREVIOUS="journal">
