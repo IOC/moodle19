@@ -54,7 +54,8 @@
         <KEY NAME="hotpot" TYPE="foreign" FIELDS="hotpot" REFTABLE="hotpot" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid" NEXT="clickreportid"/>
+        <INDEX NAME="clickreportid" UNIQUE="false" FIELDS="clickreportid" PREVIOUS="userid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="hotpot_details" COMMENT="raw details (as XML) of Hot Potatoes quiz attempts" PREVIOUS="hotpot_attempts" NEXT="hotpot_questions">
