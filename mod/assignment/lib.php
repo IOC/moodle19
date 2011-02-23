@@ -2987,23 +2987,6 @@ function assignment_print_overview($courses, &$htmlarray) {
     $strassignment = get_string('modulename', 'assignment');
     $strreviewed = get_string('reviewed','assignment');
 
-
-    // NOTE: we do all possible database work here *outside* of the loop to ensure this scales
-
-    // build up and array of unmarked submissions indexed by assigment id/ userid
-    // for use where the user has grading rights on assigment
-    $rs = get_recordset_sql("SELECT id, assignment, userid
-                            FROM {$CFG->prefix}assignment_submissions
-                            WHERE teacher = 0 AND timemarked = 0
-                            AND assignment IN (". implode(',', $assignmentids).")");
-
-    $unmarkedsubmissions = array();
-    while ($ra = rs_fetch_next_record($rs)) {
-        $unmarkedsubmissions[$ra->assignment][$ra->userid] = $ra->id;
-    }
-    rs_close($rs);
-
-
     // get all user submissions, indexed by assigment id
     $mysubmissions = get_records_sql("SELECT assignment, timemarked, teacher, grade
                                       FROM {$CFG->prefix}assignment_submissions
@@ -3047,9 +3030,11 @@ function assignment_print_overview($courses, &$htmlarray) {
             }
             $group_submissions = array();
             $students = get_users_by_capability($context, 'mod/assignment:submit', 'u.id', '', '', '', 0, '', false);
+            $select = "assignment={$assignment->id} AND teacher=0 AND timemarked=0";
+            $unmarkedsubmissions = get_records_select('assignment_submissions', $select, '', 'userid');
             if ($students) {
                 foreach($students as $student){
-                    if(isset($unmarkedsubmissions[$assignment->id][$student->id])){
+                    if(isset($unmarkedsubmissions[$student->id])){
                         $submissions++;
                         if (isset($student_groups[$assignment->course][$student->id])) {
                             foreach ($student_groups[$assignment->course][$student->id] as $groupid) {
