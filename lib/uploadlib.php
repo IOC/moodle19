@@ -802,9 +802,9 @@ function clam_log_infected($oldfilepath='', $newfilepath='', $userid=0) {
  * @param boolean $update If true this function will overwrite old record (used for forum moving etc).
  */
 function clam_change_log($oldpath, $newpath, $update=true) {
-    global $CFG;
+    global $CFG, $COURSE;
     
-    if (!$record = get_record('log', 'info', $oldpath, 'module', 'upload')) {
+    if (!$record = get_record('log', 'info', $oldpath, 'module', 'upload', 'course', $COURSE->id)) {
         return false;
     }
     $record->info = $newpath;
