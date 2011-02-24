@@ -535,7 +535,6 @@ function schedule_backup_course_configure($course,$starttime = 0) {
     if ($status) {
         if ($preferences->backup_logs) {
             schedule_backup_log($starttime,$course->id,"    calculating logs");
-            log_check_backup($course->id);
         }
     }
 
