@@ -45,16 +45,6 @@
         redirect('edit.php?cmid='.$cm->id);
     }
 
-    // Upgrade any attempts that have not yet been upgraded to the
-    // Moodle 1.5 model (they will not yet have the timestamp set)
-    if ($attempts = get_records_sql("SELECT a.*".
-           "  FROM {$CFG->prefix}quiz_attempts a, {$CFG->prefix}question_states s".
-           " WHERE a.quiz = '$quiz->id' AND s.attempt = a.uniqueid AND s.timestamp = 0")) {
-        foreach ($attempts as $attempt) {
-            quiz_upgrade_states($attempt);
-        }
-    }
-
     add_to_log($course->id, "quiz", "report", "report.php?id=$cm->id", "$quiz->id", "$cm->id");
 
 /// Open the selected quiz report and display it
