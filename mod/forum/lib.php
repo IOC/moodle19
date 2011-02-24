@@ -1126,6 +1126,7 @@ function forum_print_overview($courses,&$htmlarray) {
         }
         $sql = substr($sql,0,-3); // take off the last OR
         $sql .= ') AND p.modified >= '.$cutoffdate.' AND r.id is NULL'
+            . ' AND d.timemodified >= '.$cutoffdate
             . ' AND d.groupid IN (' . implode(',', $groups) . ')'
             . ' GROUP BY d.forum,d.course';
 
@@ -2520,8 +2521,7 @@ function forum_get_discussions_count($cm) {
 
     $sql = "SELECT COUNT(d.id)
               FROM {$CFG->prefix}forum_discussions d
-                   JOIN {$CFG->prefix}forum_posts p ON p.discussion = d.id
-             WHERE d.forum = {$cm->instance} AND p.parent = 0
+             WHERE d.forum = {$cm->instance}
                    $timelimit $groupselect";
 
     return get_field_sql($sql);
@@ -6376,21 +6376,10 @@ function forum_tp_clean_read_records() {
 // Look for records older than the cutoffdate that are still in the forum_read table.
     $cutoffdate = time() - ($CFG->forum_oldpostdays*24*60*60);
 
-    //first get the oldest tracking present - we need tis to speedup the next delete query
-    $sql = "SELECT MIN(fp.modified) AS first
-              FROM {$CFG->prefix}forum_posts fp
-                   JOIN {$CFG->prefix}forum_read fr ON fr.postid=fp.id";
-    if (!$first = get_field_sql($sql)) {
-        // nothing to delete;
-        return;
-    }
-
     // now delete old tracking info
-    $sql = "DELETE
-              FROM {$CFG->prefix}forum_read
-             WHERE postid IN (SELECT fp.id
-                                FROM {$CFG->prefix}forum_posts fp
-                               WHERE fp.modified >= $first AND fp.modified < $cutoffdate)";
+    $sql = "DELETE r.* FROM {$CFG->prefix}forum_read r"
+        . " JOIN {$CFG->prefix}forum_posts p ON p.id = r.postid"
+        . " WHERE p.modified < $cutoffdate";
     execute_sql($sql, false);
 }
 
