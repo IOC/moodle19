@@ -13,7 +13,7 @@
 
     require_login($course);
     $context = get_context_instance(CONTEXT_COURSE, $course->id);
-    require_capability('coursereport/outline:view', $context);
+    require_capability('moodle/site:doanything', $context);
 
     add_to_log($course->id, 'course', 'report outline', "report/outline/index.php?id=$course->id", $course->id);
 
