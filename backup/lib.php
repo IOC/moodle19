@@ -951,9 +951,6 @@
         //Check users
         user_check_backup($course->id,$preferences->backup_unique_code,$preferences->backup_users,$preferences->backup_messages, $preferences->backup_blogs);
 
-        //Check logs
-        log_check_backup($course->id);
-
         //Check user files
         user_files_check_backup($course->id,$preferences->backup_unique_code);
 
