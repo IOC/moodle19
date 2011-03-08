@@ -270,13 +270,15 @@ function groups_delete_group_members($courseid, $userid=0, $showfeedback=false) 
     }
 
     if ($userid) {
-        $usersql = "AND userid = $userid";
+        $usersql = "AND gm.userid = $userid";
     } else {
         $usersql = "";
     }
 
-    $groupssql = "SELECT id FROM {$CFG->prefix}groups g WHERE g.courseid = $courseid";
-    delete_records_select('groups_members', "groupid IN ($groupssql) $usersql");
+    $sql = "DELETE gm.* FROM {$CFG->prefix}groups_members gm"
+        . " JOIN {$CFG->prefix}groups g ON g.id = gm.groupid"
+        . " WHERE g.courseid = $courseid $usersql";
+    execute_sql($sql, false);
 
     //trigger groups events
     $eventdata = new object();
