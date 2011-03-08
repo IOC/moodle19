@@ -128,6 +128,7 @@ if ($data = data_submitted() and confirm_sesskey() and has_capability('moodle/gr
 
 // Override perpage if set in URL
 if ($perpageurl) {
+    $perpageurl = min($perpageurl, 100);
     $report->user_prefs['studentsperpage'] = $perpageurl;
 }
 
