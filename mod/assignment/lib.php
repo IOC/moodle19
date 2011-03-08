@@ -1027,6 +1027,7 @@ class assignment_base {
         if (isset($_POST['updatepref'])){
             $perpage = optional_param('perpage', 10, PARAM_INT);
             $perpage = ($perpage <= 0) ? 10 : $perpage ;
+            $perpage = min($perpage, 100);
             set_user_preference('assignment_perpage', $perpage);
             set_user_preference('assignment_quickgrade', optional_param('quickgrade', 0, PARAM_BOOL));
         }
