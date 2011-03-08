@@ -243,6 +243,7 @@
     $oldperpage = get_user_preferences('data_perpage_'.$data->id, 10);
     $perpage = optional_param('perpage', $oldperpage, PARAM_INT);
 
+    $perpage = min($perpage, 100);
     if ($perpage < 2) {
         $perpage = 2;
     }

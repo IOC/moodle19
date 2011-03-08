@@ -1054,7 +1054,7 @@ function data_print_preference_form($data, $perpage, $search, $sort='', $order='
     }
     echo '<label for="pref_perpage">'.get_string('pagesize','data').'</label> ';
     $pagesizes = array(2=>2,3=>3,4=>4,5=>5,6=>6,7=>7,8=>8,9=>9,10=>10,15=>15,
-                       20=>20,30=>30,40=>40,50=>50,100=>100,200=>200,300=>300,400=>400,500=>500,1000=>1000);
+                       20=>20,30=>30,40=>40,50=>50,100=>100);
     choose_from_menu($pagesizes, 'perpage', $perpage, '', '', '0', false, false, 0, 'pref_perpage');
      echo '<div id="reg_search" style="display: ';
     if ($advanced) {
