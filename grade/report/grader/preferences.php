@@ -47,6 +47,9 @@ if (!$mform->is_cancelled() && $data = $mform->get_data()) {
         if ($value == GRADE_REPORT_PREFERENCE_DEFAULT || strlen($value) == 0) {
             unset_user_preference($preference);
         } else {
+            if ($preference == "grade_report_studentsperpage") {
+                $value = min($value, 100);
+            }
             set_user_preference($preference, $value);
         }
     }
