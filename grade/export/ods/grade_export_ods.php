@@ -48,7 +48,8 @@ class grade_export_ods extends grade_export {
         $myxls->write_string(0,3,get_string("institution"));
         $myxls->write_string(0,4,get_string("department"));
         $myxls->write_string(0,5,get_string("email"));
-        $pos=6;
+        $myxls->write_string(0,6,get_string("username"));
+        $pos=7;
         foreach ($this->columns as $grade_item) {
             $myxls->write_string(0, $pos++, $this->format_column_name($grade_item));
 
@@ -73,7 +74,8 @@ class grade_export_ods extends grade_export {
             $myxls->write_string($i,3,$user->institution);
             $myxls->write_string($i,4,$user->department);
             $myxls->write_string($i,5,$user->email);
-            $j=6;
+            $myxls->write_string($i,6,$user->username);
+            $j=7;
             foreach ($userdata->grades as $itemid => $grade) {
                 if ($export_tracking) {
                     $status = $geub->track($grade);
