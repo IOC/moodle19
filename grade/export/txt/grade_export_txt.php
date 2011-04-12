@@ -77,7 +77,8 @@ class grade_export_txt extends grade_export {
              get_string("idnumber").$separator.
              get_string("institution").$separator.
              get_string("department").$separator.
-             get_string("email");
+             get_string("email").$separator.
+             get_string("username");
 
         foreach ($this->columns as $grade_item) {
             echo $separator.$this->format_column_name($grade_item);
@@ -97,7 +98,7 @@ class grade_export_txt extends grade_export {
 
             $user = $userdata->user;
 
-            echo $user->firstname.$separator.$user->lastname.$separator.$user->idnumber.$separator.$user->institution.$separator.$user->department.$separator.$user->email;
+            echo $user->firstname.$separator.$user->lastname.$separator.$user->idnumber.$separator.$user->institution.$separator.$user->department.$separator.$user->email.$separator.$user->username;
 
             foreach ($userdata->grades as $itemid => $grade) {
                 if ($export_tracking) {
