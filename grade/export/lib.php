@@ -208,7 +208,8 @@ class grade_export {
              '<th>'.get_string("idnumber")."</th>".
              '<th>'.get_string("institution")."</th>".
              '<th>'.get_string("department")."</th>".
-             '<th>'.get_string("email")."</th>";
+             '<th>'.get_string("email")."</th>".
+             '<th>'.get_string("username")."</th>";
         foreach ($this->columns as $grade_item) {
             echo '<th>'.$this->format_column_name($grade_item).'</th>';
 
@@ -262,7 +263,7 @@ class grade_export {
             }
 
             echo '<tr>';
-            echo "<td>$user->firstname</td><td>$user->lastname</td><td>$user->idnumber</td><td>$user->institution</td><td>$user->department</td><td>$user->email</td>";           
+            echo "<td>$user->firstname</td><td>$user->lastname</td><td>$user->idnumber</td><td>$user->institution</td><td>$user->department</td><td>$user->email</td><td>$user->username</td>";
             echo $rowstr;
             echo "</tr>";
             
