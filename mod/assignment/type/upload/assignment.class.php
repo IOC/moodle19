@@ -596,6 +596,7 @@ class assignment_upload extends assignment_base {
             $updated = new object();
             $updated->id           = $submission->id;
             $updated->timemodified = time();
+            $updated->numfiles = $this->count_user_files($USER->id);
 
             if (update_record('assignment_submissions', $updated)) {
                 add_to_log($this->course->id, 'assignment', 'upload',
@@ -837,6 +838,7 @@ class assignment_upload extends assignment_base {
                 $updated = new object();
                 $updated->id = $submission->id;
                 $updated->timemodified = time();
+                $updated->numfiles = $this->count_user_files($USER->id);
                 if (update_record('assignment_submissions', $updated)) {
                     add_to_log($this->course->id, 'assignment', 'upload', //TODO: add delete action to log
                             'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
