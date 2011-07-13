@@ -4384,6 +4384,24 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml='', $a
         }
     }
 
+    if (!empty($CFG->local_xtecmail)) {
+        require_once("$CFG->dirroot/lib/soaplib.php");
+        require_once("$CFG->dirroot/opt/lib/xtecmail/mailsender.class.php");
+        $mailsender = new mailsender($CFG->local_xtecmail_app,
+                                     ($mail->ReplyTo ? $mail->ReplyTo[0][0] : $mail->From),
+                                     $CFG->local_xtecmail_sender,
+                                     $CFG->local_xtecmail_env,
+                                     (bool) $CFG->local_xtecmail_log,
+                                     $CFG->local_xtecmail_debug,
+                                     $CFG->local_xtecmail_log);
+        $mailsender->add_message(array($mail->to[0][0]), array(), array(),
+                                 $mail->Subject, $mail->Body,
+                                 $attachment ? array($attachname) : array(),
+                                 $attachment ? array("$CFG->dataroot/$attachment") : array(),
+                                 array(), array(), $mail->ContentType);
+        return $mailsender->send_mail();
+    }
+
     if ($mail->Send()) {
         set_send_count($user);
         $mail->IsSMTP();                               // use SMTP directly
