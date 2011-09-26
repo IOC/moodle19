@@ -804,7 +804,11 @@ function forum_cron() {
 
     if (!empty($CFG->forum_lastreadclean)) {
         $timenow = time();
-        if ($CFG->forum_lastreadclean + (24*3600) < $timenow) {
+        $timeclean = mktime($CFG->forum_cleanreadtime, 0, 0,
+                            idate("m", $timenow), idate("d", $timenow),
+                            idate("Y", $timenow));
+        if ($timenow >= $timeclean and $timenow < $timeclean + 3600
+            and $CFG->forum_lastreadclean < $timeclean) {
             set_config('forum_lastreadclean', $timenow);
             mtrace('Removing old forum read tracking info...');
             forum_tp_clean_read_records();
