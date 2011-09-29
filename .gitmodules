@@ -1,0 +1,15 @@
+[submodule "local"]
+	path = local
+	url = http://git.ioc.cat/moodle-local.git
+[submodule "theme/ioc"]
+	path = theme/ioc
+	url = http://git.ioc.cat/moodle-tema.git
+[submodule "opt"]
+	path = opt
+	url = http://git.ioc.cat/moodle-opt.git
+[submodule "mod/fct"]
+	path = mod/fct
+	url = http://git.ioc.cat/moodle-fct.git
+[submodule "mod/choosegroup"]
+	path = mod/choosegroup
+	url = git://github.com/IOC/moodle-choosegroup.git
