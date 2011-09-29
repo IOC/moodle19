@@ -111,8 +111,6 @@ class edit_item_form extends moodleform {
                          GRADE_DISPLAY_TYPE_PERCENTAGE_REAL    => get_string('percentagereal', 'grades')
                          );
 
-        asort($options);
-
         foreach ($options as $key=>$option) {
             if ($key == $default_gradedisplaytype) {
                 $options[GRADE_DISPLAY_TYPE_DEFAULT] = get_string('defaultprev', 'grades', $option);
