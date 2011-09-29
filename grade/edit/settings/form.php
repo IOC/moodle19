@@ -75,7 +75,6 @@ class course_settings_form extends moodleform {
                          GRADE_DISPLAY_TYPE_LETTER_PERCENTAGE => get_string('letterpercentage', 'grades'),
                          GRADE_DISPLAY_TYPE_PERCENTAGE_LETTER => get_string('percentageletter', 'grades'),
                          GRADE_DISPLAY_TYPE_PERCENTAGE_REAL => get_string('percentagereal', 'grades'));
-        asort($options);
 
         $default_gradedisplaytype = $CFG->grade_displaytype;
         foreach ($options as $key=>$option) {
