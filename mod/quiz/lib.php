@@ -139,6 +139,9 @@ function quiz_delete_instance($id) {
             if (! delete_records("question_sessions", "attemptid", "$attempt->uniqueid")) {
                 $result = false;
             }
+            if (! delete_records("question_attempts", "id", "$attempt->uniqueid")) {
+                $result = false;
+            }
         }
     }
 
