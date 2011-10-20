@@ -1191,6 +1191,9 @@ function question_get_feedback_class($fraction) {
 */
 function regrade_question_in_attempt($question, $attempt, $cmoptions, $verbose=false) {
 
+    // workaround for bug when regrading random questions
+    $question = clone($question);
+
     // load all states for this question in this attempt, ordered in sequence
     if ($states = get_records_select('question_states',
             "attempt = '{$attempt->uniqueid}' AND question = '{$question->id}'",
