@@ -8,6 +8,8 @@ class quiz_report extends quiz_default_report {
     function display($quiz, $cm, $course) {
         global $CFG;
 
+        local_raise_resource_limits();
+
         // Print header
         $this->print_header_and_tabs($cm, $course, $quiz, $reportmode="regrade");
 
@@ -45,7 +47,6 @@ class quiz_report extends quiz_default_report {
         foreach ($questions as $question) {
             echo '<strong>'.get_string('regradingquestion', 'quiz', $question->name).'</strong> '.get_string('attempts', 'quiz').": \n";
             foreach ($attempts as $attempt) {
-                set_time_limit(30);
                 $changed = regrade_question_in_attempt($question, $attempt, $quiz, true);
                 if ($changed) {
                     link_to_popup_window ('/mod/quiz/reviewquestion.php?attempt='.$attempt->id.'&amp;question='.$question->id,
