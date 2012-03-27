@@ -1081,14 +1081,14 @@ class question_calculated_qtype extends question_dataset_dependent_questiontype 
             //Now restore numerical_units
             $status = question_restore_numerical_units ($old_question_id,$new_question_id,$cal_info,$restore);
 
-            //Now restore dataset_definitions
-            if ($status && $newid) {
-                $status = question_restore_dataset_definitions ($old_question_id,$new_question_id,$cal_info,$restore);
-            }
-
             if (!$newid) {
                 $status = false;
             }
+        }
+
+        //Now restore dataset_definitions
+        if ($status) {
+            $status = question_restore_dataset_definitions ($old_question_id,$new_question_id,$cal_info,$restore);
         }
 
         return $status;
