@@ -250,7 +250,7 @@ class quiz_report extends quiz_default_report {
         $table->define_baseurl($this->viewurl->out());
 
         $table->sortable(true);
-        $table->initialbars($usercount>20);  // will show initialbars if there are more than 20 users
+        $table->initialbars(true);
         $table->pageable(true);
         $table->collapsible(true);
 
