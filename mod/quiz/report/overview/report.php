@@ -456,7 +456,7 @@ class quiz_report extends quiz_default_report {
 
             // Build table rows
             if (!$download) {
-                $table->initialbars($totalinitials>20);
+                $table->initialbars(true);
             }
             if ($attempts) {
                 if($detailedmarks) {
