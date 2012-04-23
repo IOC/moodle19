@@ -1545,8 +1545,8 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="timecreated"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="courseid"/>
-        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="courseid-name"/>
+        <KEY NAME="courseid-name" TYPE="unique" FIELDS="courseid, name" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="groupings" COMMENT="A grouping is a collection of groups. WAS: groups_groupings" PREVIOUS="groups" NEXT="groups_members">
