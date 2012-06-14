@@ -84,6 +84,9 @@ foreach($fields as $key => $field) {
         $exportdata[0][] = $field->field->name;
     }
 }
+if (!empty($formdata['field_user'])) {
+    $exportdata[0][] = get_string('user');
+}
 $groupid = groups_get_activity_group($cm);
 
 $datarecords = get_records('data_records', 'dataid', $data->id);
@@ -109,6 +112,10 @@ foreach($datarecords as $record) {
                 $contents = $field->export_text_value($content[$field->field->id]);
             }
             $exportdata[$line][] = $contents;
+        }
+        if (!empty($formdata['field_user'])) {
+            $user = get_record('user', 'id', $record->userid, '', '', '', '', 'firstname, lastname');
+            $exportdata[$line][] = fullname($user);
         }
     }
     $line++;

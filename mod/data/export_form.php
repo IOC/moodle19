@@ -49,6 +49,9 @@ class mod_data_export_form extends moodleform {
                 $mform->addElement('static', 'unsupported'.$field->field->id, $field->field->name, get_string('unsupportedexport', 'data', $a));
             }
         }
+        $mform->addElement('advcheckbox', 'field_user', get_string('user'), '', array('group' => 1));
+        $mform->setDefault('field_user', 0);
+
         $this->add_checkbox_controller(1, null, null, 1);
         $this->add_action_buttons(true, get_string('exportdatabaserecords', 'data'));
     }
