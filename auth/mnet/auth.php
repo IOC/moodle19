@@ -114,6 +114,33 @@ class auth_plugin_mnet extends auth_plugin_base {
         $userdata['wwwroot']                 = $MNET->wwwroot;
         $userdata['session.gc_maxlifetime']  = ini_get('session.gc_maxlifetime');
         $userdata['picture']                 = $user->picture;
+        $userdata['policyagreed']            = $user->policyagreed;
+        $userdata['suspended']               = $user->suspended;
+        $userdata['idnumber']                = $user->idnumber;
+        $userdata['emailstop']               = $user->emailstop;
+        $userdata['icq']                     = $user->icq;
+        $userdata['skype']                   = $user->skype;
+        $userdata['yahoo']                   = $user->yahoo;
+        $userdata['aim']                     = $user->aim;
+        $userdata['msn']                     = $user->msn;
+        $userdata['phone1']                  = $user->phone1;
+        $userdata['phone2']                  = $user->phone2;
+        $userdata['institution']             = $user->institution;
+        $userdata['department']              = $user->department;
+        $userdata['address']                 = $user->address;
+        $userdata['firstaccess']             = $user->firstaccess;
+        $userdata['lastaccess']              = $user->lastaccess;
+        $userdata['lastlogin']               = $user->lastlogin;
+        $userdata['currentlogin']            = $user->currentlogin;
+        $userdata['secret']                  = $user->secret;
+        $userdata['url']                     = $user->url;
+        $userdata['descriptionformat']       = $user->descriptionformat;
+        $userdata['ajax']                    = $user->ajax;
+        $userdata['autosubscribe']           = $user->autosubscribe;
+        $userdata['trackforums']             = $user->trackforums;
+        $userdata['trustbitmask']            = $user->trustbitmask;
+        $userdata['imagealt']                = $user->imagealt;
+        $userdata['screenreader']            = $user->screenreader;
         if (!empty($user->picture)) {
             $imagefile = make_user_directory($user->id, true) . "/f1.jpg";
             if (file_exists($imagefile)) {
