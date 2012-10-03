@@ -797,35 +797,93 @@ function print_log_graph($course, $userid=0, $type="course.png", $date=0) {
 }
 
 
-function print_overview($courses) {
+function fetch_overview($courses, $full, &$cat_names, &$cat_courses, &$htmlarray) {
 
-    global $CFG, $USER;
+    global $CFG;
+
+    $visible_courses = array();
+    foreach ($courses as $id => $course) {
+        if ($course->visible) {
+            $visible_courses[$id] = $course;
+        }
+    }
 
     $htmlarray = array();
-    if ($modules = get_records('modules')) {
+    if ($full and $modules = get_records('modules')) {
         foreach ($modules as $mod) {
             if (file_exists(dirname(dirname(__FILE__)).'/mod/'.$mod->name.'/lib.php')) {
                 include_once(dirname(dirname(__FILE__)).'/mod/'.$mod->name.'/lib.php');
                 $fname = $mod->name.'_print_overview';
                 if (function_exists($fname)) {
-                    $fname($courses,$htmlarray);
+                    $fname($visible_courses,$htmlarray);
                 }
             }
         }
     }
+
+    $cat_names = $cat_parents = $cat_courses = array();
+    make_categories_list($cat_names, $cat_parents);
+
     foreach ($courses as $course) {
+        $parent = $course->category;
+        while (!empty($cat_parents[$parent])) {
+            $parent = $cat_parents[$parent][0];
+        }
+        $cat_courses[$parent][$course->id] = $course;
+    };
+}
+
+function print_overview($courses, $full=true) {
+
+    global $CFG;
+
+    fetch_overview($courses, $full, $cat_names, $cat_courses, $htmlarray);
+
+    print_heading(get_string('mycourses'),'',2,'headingblock');
+    foreach ($cat_names as $id => $name) {
+        if (empty($cat_courses[$id])) continue;
+        echo '<div class="categorybox"><h2>' . s($name) . '</h2>';
+
+    foreach ($cat_courses[$id] as $course) {
+        $show_overview = '';
+        if ($course->visible) {
+            if ($full) {
+                if (array_key_exists($course->id, $htmlarray)) {
+                    if (count($htmlarray[$course->id]) > 0) {
+                        $show_overview = '';
+                        foreach (array_keys($htmlarray[$course->id]) as $mod) {
+                            $modname = get_string("modulenameplural", $mod);
+                            $show_overview .= '&nbsp;<a href="#"'
+                                . ' class="overview-link" id="overview-'
+                                . $course->id . '-' . $mod . '-link"'
+                                . ' title="' . $modname . '">'
+                                . '<img src="' . $CFG->modpixpath . '/' . $mod
+                                . '/icon.gif" class="icon" alt="' . $modname
+                                . '" /></a>';
+                        }
+                    }
+                }
+            } else {
+                $show_overview = '<img class="overview-loading"'
+                    . ' src="'. $CFG->pixpath . '/i/ajaxloader.gif"'
+                    . ' style="display: none" alt="" />';
+            }
+        }
         print_simple_box_start('center', '100%', '', 5, "coursebox");
         $linkcss = '';
         if (empty($course->visible)) {
             $linkcss = 'class="dimmed"';
         }
-        print_heading('<a title="'. format_string($course->fullname).'" '.$linkcss.' href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'">'. format_string($course->fullname).'</a>');
+        print_heading('<a title="'. format_string($course->fullname).'" '.$linkcss.' href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'">'. format_string($course->fullname).'</a>&nbsp;'.$show_overview);
         if (array_key_exists($course->id,$htmlarray)) {
             foreach ($htmlarray[$course->id] as $modname => $html) {
-                echo $html;
+                echo '<div class="course-overview"  id="overview-' . $course->id
+                    . '-' . $modname .'">' . $html . '</div>';
             }
         }
         print_simple_box_end();
+    }
+        echo '</div>';
     }
 }
 
