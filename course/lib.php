@@ -2329,6 +2329,54 @@ function print_remote_course($course, $width="100%") {
     echo '</div>';
 }
 
+function print_remote_courses($courses) {
+
+    global $CFG, $USER;
+
+    mymoodle_js_config();
+    $hidden = (empty($courses)?' myhidden':'');
+    print_box_start($hidden, 'rcourse-list');
+    print_box_start('categorybox');
+    $remotehostname = get_field('mnet_host', 'name', 'id', $CFG->local_myremotehost);
+    print_heading(get_string('myremotecourses', 'local', '<a href="'.$CFG->wwwroot.'/auth/mnet/jump.php?hostid='.$CFG->local_myremotehost.'">'.$remotehostname.' </a>'), '', 2, 'headingblock');
+    print_box_start('rcourses');
+    echo '<img class="overview-loading roverview-link"'.
+         ' src="'. $CFG->pixpath . '/i/ajaxloader.gif"'.
+         ' alt="" />';
+    print_box_end();
+    print_box_end();
+    print_box_end();
+}
+
+function mymoodle_js_config() {
+    global $CFG;
+
+    $msgtimeout = str_replace( "'", "\\'", get_string('myremotetimeout', 'local'));
+    $msgnocourses = str_replace( "'", "\\'", get_string('myremotenocourses', 'local'));
+    $jsconf = array(
+        'timeouterror' => $msgtimeout,
+        'nocourseserror' => $msgnocourses,
+        'hostid' => ($CFG->local_myremotehost ? $CFG->local_myremotehost : ''),
+        'url' => $CFG->wwwroot . '/auth/mnet/jump.php',
+        'wantsurl' => '/blocks/myremotecourses/ajax.php'
+    );
+
+    if (!empty($jsconf['hostid'])) {
+        $jsconfvalues = array();
+
+        foreach ($jsconf as $key => $value) {
+            $jsconfvalues[] = "$key: '$value'";
+        }
+
+        echo('<script type="text/javascript">
+                //<![CDATA[
+                M_config = {' . implode(', ', $jsconfvalues) . '};
+                getremotecourses();
+                //]]>
+                </script>');
+    }
+}
+
 function print_remote_host($host, $width="100%") {
 
     global $CFG, $USER;

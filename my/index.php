@@ -132,7 +132,16 @@
             $courses[$c->id]->lastaccess = 0;
         }
     }
-    
+
+    if (!empty($CFG->local_myremotehost)) {
+        $rcourses = get_my_remotecourses($USER->id);
+        if ($rcourses and !empty($CFG->local_myremote_message)) {
+            echo '<div class="myremote-message">';
+            echo format_text($CFG->local_myremote_message, FORMAT_HTML);
+            echo '</div>';
+        }
+    }
+
     if (empty($courses)) {
         print_simple_box(get_string('nocourses','my'),'center');
     } else {
@@ -166,6 +175,11 @@
     }
 
     echo '<br/><a href="' . $CFG->wwwroot . '/course/index.php">' . get_string('fulllistofcourses') . ' ...</a>';
+
+    // Remote courses on my Moodle
+    if (!empty($CFG->local_myremotehost)) {
+        print_remote_courses($rcourses);
+    }
 
     print_container_end();
     echo '</td>';
