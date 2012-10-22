@@ -1205,9 +1205,16 @@ define('RESTORE_GROUPS_GROUPINGS', 3);
                 $course->theme = '';
             }
 
+            $course->restrictmodules = !empty($CFG->restrictbydefault);
+
             //Now insert the record
             $newid = insert_record("course",$course);
             if ($newid) {
+                $course->id = $newid;
+                if ($course->restrictmodules) {
+                    $allowedmods = explode(',', $CFG->defaultallowedmodules);
+                    update_restricted_mods($course, $allowedmods);
+                }
                 if (isset($course_header->course_local)) {
                     local_course_restore($newid, $course_header->course_local);
                 }
