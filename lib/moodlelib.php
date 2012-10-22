@@ -3826,6 +3826,8 @@ function remove_course_contents($courseid, $showfeedback=true) {
     remove_course_grades($courseid, $showfeedback);
     remove_grade_letters($context, $showfeedback);
 
+    delete_records('course_allowed_modules', 'course', $courseid);
+
     return $result;
 }
 
