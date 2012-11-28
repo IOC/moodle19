@@ -66,17 +66,17 @@ class auth_plugin_mnet extends auth_plugin_base {
     }
 
     /**
-     * Return user data for the provided token, compare with user_agent string.
+     * Return user data for the provided token
      *
      * @param  string $token    The unique ID provided by remotehost.
-     * @param  string $UA       User Agent string.
+     * @param  string $UA       User Agent string as seen by peer - ignored
      * @return array  $userdata Array of user info for remote host
      */
     function user_authorise($token, $useragent) {
         global $CFG, $MNET, $SITE, $MNET_REMOTE_CLIENT;
         require_once $CFG->dirroot . '/mnet/xmlrpc/server.php';
 
-        $mnet_session = get_record('mnet_session', 'token', $token, 'useragent', $useragent);
+        $mnet_session = get_record('mnet_session', 'token', $token);
         if (empty($mnet_session)) {
             echo mnet_server_fault(1, get_string('authfail_nosessionexists', 'mnet'));
             exit;
@@ -1225,12 +1225,12 @@ class auth_plugin_mnet extends auth_plugin_base {
      * calls the function (over xmlrpc) provides us with the mnethostid we need.
      *
      * @param   string  $username       Username for session to kill
-     * @param   string  $useragent      SHA1 hash of user agent to look for
+     * @param   string  $useragent      SHA1 hash of user agent as seen by peer - ignored
      * @return  bool                    True on success
      */
     function kill_child($username, $useragent) {
         global $CFG, $MNET_REMOTE_CLIENT;
-        $session = get_record('mnet_session', 'username', addslashes($username), 'mnethostid', $MNET_REMOTE_CLIENT->id, 'useragent', $useragent);
+        $session = get_record('mnet_session', 'username', addslashes($username), 'mnethostid', $MNET_REMOTE_CLIENT->id);
         if (false != $session) {
             $start = ob_start();
 
