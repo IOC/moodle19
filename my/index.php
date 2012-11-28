@@ -9,6 +9,27 @@
     
     require_login();
 
+    if (optional_param('overview', false, PARAM_BOOL)) {
+        $courses = get_my_courses($USER->id, 'visible DESC,sortorder ASC', '*', false);
+        $site = get_site();
+        if (array_key_exists($site->id, $courses)) {
+            unset($courses[$site->id]);
+        }
+        foreach ($courses as $c) {
+            if (isset($USER->lastcourseaccess[$c->id])) {
+                $courses[$c->id]->lastaccess = $USER->lastcourseaccess[$c->id];
+            } else {
+                $courses[$c->id]->lastaccess = 0;
+            }
+        }
+        if (empty($courses)) {
+            print_simple_box(get_string('nocourses','my'),'center');
+        } else {
+            print_overview($courses, true);
+        }
+        die;
+    }
+
     $mymoodlestr = get_string('mymoodle','my');
 
     if (isguest()) {
@@ -47,7 +68,13 @@
         $USER->editing = $edit;
     }
 
+    require_js(array('yui_yahoo', 'yui_event', 'yui_dom', 'yui_connection', 'yui_json'));
+
     $PAGE->print_header($mymoodlestr);
+
+    echo "<script type=\"text/javascript\">//<![CDATA[\n";
+    include $CFG->dirroot . '/my/index.js';
+    echo "\n//]]></script>";
 
     echo '<table id="layout-table">';
     echo '<tr valign="top">';
@@ -84,7 +111,7 @@
         $courses_limit = $courses_limit + 1;
     }
 
-    $courses = get_my_courses($USER->id, 'visible DESC,sortorder ASC', '*', false, $courses_limit);
+    $courses = get_my_courses($USER->id, 'visible DESC,sortorder ASC', '*', false);
     $site = get_site();
     $course = $site; //just in case we need the old global $course hack
 
@@ -105,18 +132,54 @@
             $courses[$c->id]->lastaccess = 0;
         }
     }
-    
+
+    if (!empty($CFG->local_myremotehost)) {
+        if (!empty($CFG->local_myremote_message)) {
+            echo '<div class="myremote-message myhidden">';
+            echo format_text($CFG->local_myremote_message, FORMAT_HTML);
+            echo '</div>';
+        }
+    }
+
     if (empty($courses)) {
         print_simple_box(get_string('nocourses','my'),'center');
     } else {
-        print_overview($courses);
+        echo '<div id="course-list">';
+        print_overview($courses, false);
+        echo '</div>';
     }
     
-    // if more than 20 courses
-    if ($morecourses) {
-        echo '<br />...';  
+    $all_courses = get_my_courses($USER->id, 'visible DESC,sortorder ASC',
+                                  null, false, 0, false);
+    $other_courses = array();
+    foreach ($all_courses as $course) {
+        if (!isset($courses[$course->id])) {
+            $other_courses[$course->id] = $course;
+        }
     }
-    
+    if ($other_courses) {
+        $cat_names = array();
+        $cat_parents = array();
+        make_categories_list($cat_names, $cat_parents);
+        $options = array();
+        foreach ($other_courses as $course) {
+            $category_name = $cat_names[$course->category];
+            $options[$category_name][$course->id] = $course->fullname;
+        };
+        echo '<br/><form action="' . $CFG->wwwroot . '/course/view.php" method="get">';
+        choose_from_menu_nested($options, 'id', '',
+                                get_string('othercourses', 'local'),
+                                'this.form.submit()', SITEID);
+        echo '</form>';
+    }
+
+    echo '<br/><a href="' . $CFG->wwwroot . '/course/index.php">' . get_string('fulllistofcourses') . ' ...</a>';
+
+    // Remote courses on my Moodle
+    if (!empty($CFG->local_myremotehost)) {
+        print_remote_courses();
+    }
+
     print_container_end();
     echo '</td>';
     
