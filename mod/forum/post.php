@@ -647,6 +647,7 @@
             error("Could not find top parent of post $post->id");
         }
     } else {
+        $toppost = new object;
         $toppost->subject = ($forum->type == "news") ? get_string("addanewtopic", "forum") :
                                                        get_string("addanewdiscussion", "forum");
     }

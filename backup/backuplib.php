@@ -59,6 +59,7 @@
                     /// might need another variable
 
             /// Now create the backup_id record
+                $backupids_rec = new object;
                 $backupids_rec->backup_code = $backup_unique_code;
                 $backupids_rec->table_name = "user";
                 $backupids_rec->old_id = $backupable_user->id;

@@ -1161,6 +1161,7 @@ function make_timestamp($year, $month=1, $day=1, $hour=0, $minute=0, $second=0, 
     $totalsecs = abs($totalsecs);
 
     if (!$str) {  // Create the str structure the slow way
+        $str = new object;
         $str->day   = get_string('day');
         $str->days  = get_string('days');
         $str->hour  = get_string('hour');
@@ -8533,6 +8534,10 @@ function is_enabled_enrol($enrol='') {
 function setup_lang_from_browser() {
 
     global $CFG, $SESSION, $USER;
+
+    if (!isset($SESSION)) {
+        return;
+    }
 
     if (!empty($SESSION->lang) or !empty($USER->lang) or empty($CFG->autolang)) {
         // Lang is defined in session or user profile, nothing to do

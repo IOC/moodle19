@@ -77,6 +77,7 @@ httpsrequired();
 
     } else if ((!empty($SESSION->wantsurl) and strstr($SESSION->wantsurl,'username=guest')) or $loginguest) {
         /// Log in as guest automatically (idea from Zbigniew Fiedorowicz)
+        $frm = new object;
         $frm->username = 'guest';
         $frm->password = 'guest';
 
@@ -88,6 +89,7 @@ httpsrequired();
             $user = weblink_auth($SESSION->wantsurl);
         }
         if ($user) {
+            $frm = new object;
             $frm->username = $user->username;
         } else {
             $frm = data_submitted();
@@ -298,6 +300,9 @@ httpsrequired();
     }
 
     if (empty($frm->username) && $authsequence[0] != 'shibboleth') {  // See bug 5184
+        if (!$frm) {
+            $frm = new object;
+        }
         if (!empty($_GET["username"])) {
             $frm->username = $_GET["username"];
         } else {
