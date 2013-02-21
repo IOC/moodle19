@@ -36,6 +36,7 @@
 
     $timenow = time();
 
+    $table = new object;
     if ($course->format == "weeks") {
         $table->head  = array ($strweek, $strname, $strassignmenttype, $strduedate, $strsubmitted, $strgrade);
         $table->align = array ("center", "left", "left", "left", "right");

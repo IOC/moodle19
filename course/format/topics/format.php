@@ -117,6 +117,7 @@
         echo '<td class="content">';
         
         echo '<div class="summary">';
+        $summaryformatoptions = new object;
         $summaryformatoptions->noclean = true;
         echo format_text($thissection->summary, FORMAT_HTML, $summaryformatoptions);
 

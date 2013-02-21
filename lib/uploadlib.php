@@ -74,6 +74,7 @@ class upload_manager {
             $course = $SITE;
         }
         
+        $this->config = new object;
         $this->config->deleteothers = $deleteothers;
         $this->config->handlecollisions = $handlecollisions;
         $this->config->recoverifmultiple = $recoverifmultiple;
@@ -141,6 +142,7 @@ class upload_manager {
                 else {
                     $newname = clean_filename($this->files[$name]['name']);
                     if ($newname != $this->files[$name]['name']) {
+                        $a = new object;
                         $a->oldname = $this->files[$name]['name'];
                         $a->newname = $newname;
                         $this->files[$name]['uploadlog'] .= get_string('uploadrenamedchars','moodle', $a);
