@@ -44,6 +44,10 @@
     
         $status = true;
 
+        if (!empty($preferences->export) and $resource->type == 'materialweb') {
+            $resource->type = 'file';
+        }
+
         //Start mod
         fwrite ($bf,start_tag("MOD",3,true));
         //Print assignment data

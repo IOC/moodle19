@@ -60,6 +60,10 @@
             return false;
         }
 
+        if (!empty($preferences->export) and $assignment->assignmenttype == 'nanogong') {
+            $assignment->assignmenttype = 'uploadsingle';
+        }
+
         $status = true;
 
         //Start mod
