@@ -48,6 +48,7 @@
 
     // Start of the table for General Forums
 
+    $generaltable = new object;
     $generaltable->head  = array ($strforum, $strdescription, $strdiscussions);
     $generaltable->align = array ('left', 'left', 'center');
 
@@ -243,6 +244,7 @@
 
 
     // Start of the table for Learning Forums
+    $learningtable = new object;
     $learningtable->head  = array ($strforum, $strdescription, $strdiscussions);
     $learningtable->align = array ('left', 'left', 'center');
 

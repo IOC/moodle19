@@ -37,6 +37,7 @@
 
         $cm = null;
 
+        $form = new object;
         $form->section          = $section;  // The section number itself - relative!!! (section column in course_sections)
         $form->visible          = $cw->visible;
         $form->course           = $course->id;

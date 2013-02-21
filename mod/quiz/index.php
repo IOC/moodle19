@@ -90,6 +90,7 @@
         $showing = 'scores';  // default
     }
 
+    $table = new object;
     $table->head = $headings;
     $table->align = $align;
 

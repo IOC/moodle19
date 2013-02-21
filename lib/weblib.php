@@ -1504,6 +1504,10 @@ function format_text($text, $format=FORMAT_MOODLE, $options=NULL, $courseid=NULL
         return ''; // no need to do any filters and cleaning
     }
 
+    if (!$options) {
+        $options = new object;
+    }
+
     if (!isset($options->trusttext)) {
         $options->trusttext = false;
     }

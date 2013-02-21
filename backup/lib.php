@@ -888,6 +888,13 @@
                 $varname = $modname.'_instances';
                 $preferences->$varname = get_all_instances_in_course($modname, $course, NULL, true);
                 foreach ($preferences->$varname as $instance) {
+                    if (!isset($preferences->mods[$modname])) {
+                        $preferences->mods[$modname] = new object;
+                        $preferences->mods[$modname]->instances = array();
+                    }
+                    if (!isset($preferences->mods[$modname]->instances[$instance->id])) {
+                        $preferences->mods[$modname]->instances[$instance->id] = new object;
+                    }
                     $preferences->mods[$modname]->instances[$instance->id]->name = $instance->name;
                     $var = 'backup_'.$modname.'_instance_'.$instance->id;
                     $preferences->$var = true;
@@ -917,7 +924,6 @@
                 $var = $modname.'_instances';
                 $instancestopass = array();
                 if (!empty($preferences->$var) && is_array($preferences->$var) && count($preferences->$var)) {
-                    $table->data = array();
                     $countinstances = 0;
                     foreach ($preferences->$var as $instance) {
                         $var1 = 'backup_'.$modname.'_instance_'.$instance->id;
