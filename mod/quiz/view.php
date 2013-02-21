@@ -87,6 +87,7 @@
 
         // Print quiz description
         if (trim(strip_tags($quiz->intro))) {
+            $formatoptions = new object;
             $formatoptions->noclean = true;
             $formatoptions->para    = false;
             print_box(format_text($quiz->intro, FORMAT_MOODLE, $formatoptions), 'generalbox', 'intro');
@@ -199,6 +200,7 @@
         $overallfeedback = $feedbackcolumn && $alloptions->overallfeedback;
 
         // Prepare table header
+        $table = new object;
         $table->class = 'generaltable quizattemptsummary';
         $table->head = array(get_string('attempt', 'quiz'), get_string('timecompleted', 'quiz'));
         $table->align = array('center', 'left');

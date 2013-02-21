@@ -2184,7 +2184,7 @@ function print_course($course, $highlightterms = '') {
     echo $enrol->get_access_icons($course);
 
     echo '</div><div class="summary">';
-    $options = NULL;
+    $options = new object;
     $options->noclean = true;
     $options->para = false;
     echo highlight($highlightterms, format_text($course->summary, FORMAT_MOODLE, $options,  $course->id));
@@ -2789,6 +2789,7 @@ function make_editing_buttons($mod, $absolute=false, $moveselect=true, $indent=-
     }
 
     if (!isset($str)) {
+        $str = new object;
         $str->delete         = get_string("delete");
         $str->move           = get_string("move");
         $str->moveup         = get_string("moveup");
