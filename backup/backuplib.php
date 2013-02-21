@@ -425,7 +425,7 @@
         if (is_null($content)) {
             $content = '$@NULL@$'; 
         } else {
-            $content = backup_encode_absolute_links($content);
+            $content = backup_encode_absolute_links($content, ($tag == 'REFERENCE'));
         }
         $st = start_tag($tag,$level,$endline,$attributes);
 
@@ -658,6 +658,9 @@
         $course = get_record("course","id",$preferences->backup_course);
         $context = get_context_instance(CONTEXT_COURSE, $course->id);
         if ($course) {
+            if (!empty($preferences->export) and $course->format == 'onetopic') {
+                $course->format = 'topics';
+            }
             //Prints course info
             fwrite ($bf,full_tag("ID",3,false,$course->id));
             //Obtain the category
@@ -2288,7 +2291,7 @@
     // - $CFG->wwwroot/file.php?file=/courseid ------------> $@FILEPHP@$ (non-slasharguments links)
     // - Every module/block/course_format xxxx_encode_content_links() is executed too
     //
-    function backup_encode_absolute_links($content) {
+    function backup_encode_absolute_links($content, $is_reference=false) {
 
         global $CFG,$preferences;
 
@@ -2327,6 +2330,11 @@
             //We are in manual backups so global preferences must exist!!
             $mypreferences = $preferences;
         }
+
+        if (!empty($preferences->export)) {
+            $content = preg_replace('/\$nanogong:(.*?)\$/', '<a href="\1">Enregistrament</a>', $content);
+        }
+
         //First, we check for every call to file.php inside the course
         $search = array($CFG->wwwroot.'/file.php/'.$mypreferences->backup_course,
                         $CFG->wwwroot.'/file.php?file=/'.$mypreferences->backup_course,
@@ -2336,6 +2344,13 @@
         $replace = array('$@FILEPHP@$', '$@FILEPHP@$', '$@FILEPHP@$', '$@FILEPHP@$');
 
         $result = str_replace($search,$replace,$content);
+
+        if (!empty($preferences->materials)) {
+            $search = $CFG->local_materials_url.'/'.$preferences->materials.'/';
+            $replace = $is_reference ? 'materials/' : '$@FILEPHP@$/materials/' ;
+            $result = str_replace($search, $replace, $result);
+        }
+
 
         // Now we look for any '$@FILEPHP@$' URLs, replacing:
         //     - slashes and %2F by $@SLASH@$
@@ -2551,6 +2566,13 @@
                 }
             }
         }
+
+        if (!empty($preferences->materials)) {
+            $from = $CFG->dataroot.'/materials/'.$preferences->materials;
+            $to = $CFG->dataroot.'/temp/backup/'.$preferences->backup_unique_code.'/course_files/materials';
+            $status = $status && backup_copy_dir($from, $to);
+        }
+
         return $status;
     }
     /*
