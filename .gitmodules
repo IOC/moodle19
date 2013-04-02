@@ -1,0 +1,15 @@
+[submodule "local"]
+	path = local
+	url = https://github.com/IOC/moodle19-local.git
+[submodule "theme/ioc"]
+	path = theme/ioc
+	url = https://github.com/IOC/moodle19-tema.git
+[submodule "opt"]
+	path = opt
+	url = https://github.com/IOC/moodle19-opt.git
+[submodule "mod/fct"]
+	path = mod/fct
+	url = https://github.com/IOC/moodle-mod-fct.git
+[submodule "mod/choosegroup"]
+	path = mod/choosegroup
+	url = https://github.com/IOC/moodle-choosegroup.git
