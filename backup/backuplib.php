@@ -1531,24 +1531,7 @@
 
         $status = true;
 
-        // see if ALL grade items of type mod of this course are being backed up
-        // if not, we do not need to backup grade category and associated grade items/grades
         $backupall = true;
-
-        if ($grade_items = get_records_sql("SELECT *
-                                              FROM {$CFG->prefix}grade_items
-                                             WHERE courseid = $preferences->backup_course
-                                                   AND itemtype = 'mod'")) {
-            foreach ($grade_items as $grade_item) {
-                // get module information
-                // if some activities not selected, we do not backup categories at all
-                if (!backup_mod_selected($preferences,$grade_item->itemmodule,$grade_item->iteminstance)) {
-                    $backupall = false;
-                    break;
-                }
-            }
-            unset($grade_items); //free memory
-        }
 
         //Gradebook header
         fwrite ($bf,start_tag("GRADEBOOK",2,true));
