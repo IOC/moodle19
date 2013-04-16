@@ -125,7 +125,7 @@ function display() {
         if (is_dir("$CFG->dataroot/$relativepath/$file")) {          // Must be a directory
             $icon = "folder.gif";
             $relativeurl = "/view.php?blah";
-            $filesize = display_size(get_directory_size("$CFG->dataroot/$relativepath/$file"));
+            $filesize = '';
 
         } else {
             $icon = mimeinfo("icon", $file);
