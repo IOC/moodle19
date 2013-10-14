@@ -24,4 +24,8 @@ while (count($parts) > 0) {
     array_pop($parts);
 }
 
-print_error('coursenotaccessible');
+if (isset($CFG->local_redirect_url) && !empty($CFG->local_redirect_url)) {
+    @header('Location: ' . $CFG->local_redirect_url . 'local/materials/secdownload.php?path='.$path);
+} else {
+    print_error('coursenotaccessible');
+}
