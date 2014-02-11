@@ -4,6 +4,8 @@ require_once('../config.php');
 
 require_login(null, false);
 
+$callback = required_param('callback', PARAM_TEXT);
+
 @header('Content-type: application/json; charset=utf-8');
 
 function print_overview_ajax($courses, $full=true) {
@@ -80,8 +82,8 @@ if (!empty($USER->id)) {
     $siteurl = $CFG->wwwroot;
 }
 
-echo json_encode(array(
+echo $callback ."(" . json_encode(array(
     'html' => $content,
     'title' => $sitetitle,
     'url' => $siteurl
-));
+)) .")";
